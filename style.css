@@ -2,3 +2,13 @@
     width: 100%;
     height: 500px;
 }
+
+.grid line {
+  stroke: rgb(100, 99, 99);
+  stroke-dasharray: 3, 3;
+  stroke-width: 1px;
+}
+
+.grid .domain {
+  display: none;
+}

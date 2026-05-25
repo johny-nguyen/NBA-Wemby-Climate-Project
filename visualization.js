@@ -30,7 +30,6 @@ async function loadData(){
 }
 
 let data = await loadData();
-console.log(data);
 
 //Loading Team Dropdowns
 // populate team dropdown dynamically
@@ -53,7 +52,7 @@ function renderChart(data){
     .attr('viewBox', `0 0 ${width} ${height}`)
 
     .style('overflow', 'visible');
-    const margin = { top: 10, right: 10, bottom: 30, left: 20 };
+    const margin = { top: 20, right: 30, bottom: 50, left: 60 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -67,6 +66,9 @@ function renderChart(data){
 
     const filtered = data.filter(d => selectedTeams.includes(d.team));
     const grouped = d3.group(filtered, d => d.team);
+    
+    
+    
 
     const x = d3.scaleLinear()
         .domain(d3.extent(data, d => d.season))
@@ -80,6 +82,28 @@ function renderChart(data){
         .x(d => x(d.season))
         .y(d => y(d[selectedMetric]));
 
+
+    // y gridlines (append before lines so they sit behind)
+    g.append('g')
+        .attr('class', 'grid')
+        .call(
+        d3.axisLeft(y)
+            .ticks(5)
+            .tickSize(-innerWidth)
+            .tickFormat('')
+        );
+
+  // x gridlines
+  g.append('g')
+    .attr('class', 'grid')
+    .attr('transform', `translate(0, ${innerHeight})`)
+    .call(
+      d3.axisBottom(x)
+        .ticks(8)
+        .tickSize(-innerHeight)
+        .tickFormat('')
+    );
+
     // x axis
     g.append('g')
         .attr('class', 'x-axis')
@@ -91,6 +115,7 @@ function renderChart(data){
         .attr('class', 'y-axis')
         .call(d3.axisLeft(y));
 
+    
     // bind one path per team
     g.selectAll('.team-line')
         .data(grouped, ([team]) => team)
@@ -113,6 +138,8 @@ function renderChart(data){
         .attr('stroke', 'white')
         .attr('stroke-width', 1.5);
     });
+    
+    
     
 }
 // team select listener
