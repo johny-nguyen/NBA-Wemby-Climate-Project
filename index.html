@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <script src="visualization.js"></script>
+    <script src="visualization.js" type='module'></script>
 
 
     <title>Wemby Climate NBA Project</title>
@@ -12,6 +12,19 @@
 
 
 <body>
-    
+    <div id="controls">
+    <!-- Team multi-select -->
+    <select id="team-select" multiple></select>
+
+    <!-- Metric radio buttons -->
+    <div id="metric-toggle">
+        <label><input type="radio" name="metric" value="pace" checked> Pace</label>
+        <label><input type="radio" name="metric" value="fga_per_game"> FGA/G</label>
+        <label><input type="radio" name="metric" value="x3pa_per_game"> 3PA/G</label>
+        <label><input type="radio" name="metric" value="wins"> Wins</label>
+    </div>
+    </div>
+
+    <svg id="chart"></svg>
 </body>
 </html>
