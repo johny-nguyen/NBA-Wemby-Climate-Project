@@ -23,7 +23,7 @@ async function loadData(){
 
     const merged = data1.map(d => ({
         ...d,
-        ...lookup.get(`${d.team}-${d.season}` ?? {})
+        ...(lookup.get(`${d.team}-${d.season}`) ?? {})
     }));
   
     return merged;
@@ -126,19 +126,57 @@ function renderChart(data){
         .attr('fill', 'none')
         .attr('stroke-width', 2);
 
-    grouped.forEach(([team, values]) => {
-    g.selectAll(`.dot-${team}`)
-        .data(values)
-        .join('circle')
-        .attr('class', `dot-${team}`)
-        .attr('cx', d => x(d.season))
-        .attr('cy', d => y(d[selectedMetric]))
-        .attr('r', 4)
-        .attr('fill', color(team))
-        .attr('stroke', 'white')
-        .attr('stroke-width', 1.5);
-    });
     
+    // tooltip
+    const tooltip = d3.select('body')
+  .selectAll('.tooltip')
+  .data([null])
+  .join('div')
+  .attr('class', 'tooltip')
+  .style('position', 'absolute')
+  .style('background', '#1a1a2e')
+  .style('color', '#fff')
+  .style('padding', '8px 12px')
+  .style('border-radius', '6px')
+  .style('font-size', '13px')
+  .style('pointer-events', 'none')
+  .style('opacity', 0);
+
+    g.selectAll('.team-points')
+  .data([...grouped])                          // one group per team
+  .join('g')
+  .attr('class', 'team-points')
+  .each(function([team, values]) {
+    d3.select(this)
+      .selectAll('circle')
+      .data(values)
+      .join('circle')
+      .attr('cx', d => x(d.season))
+      .attr('cy', d => y(d[selectedMetric]))
+      .attr('r', 10)
+      .attr('fill', color(team))
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 1)
+      .on('mouseover', (event, d) => {
+       const [px, py] = [x(d.season), y(d[selectedMetric])];
+    const svgNode = svg.node();
+    const svgRect = svgNode.getBoundingClientRect();
+
+    // Convert SVG coords → screen coords
+    const scaleX = svgRect.width  / width;   // accounts for viewBox scaling
+    const scaleY = svgRect.height / height;
+
+    tooltip
+        .style('opacity', 1)
+        .style('left', `${svgRect.left + (margin.left + px) * scaleX + 12}px`)
+        .style('top',  `${svgRect.top  + (margin.top  + py) * scaleY - 28}px`)
+        .html(`
+        <strong>${d.team}</strong><br/>
+        Season: ${d.season}<br/>
+        ${selectedMetric}: ${d[selectedMetric]?.toFixed(1)}<br/>
+          `);
+      })
+  });
     
     
 }
