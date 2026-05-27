@@ -41,6 +41,68 @@ teams.forEach(t => select.append('option').text(t).attr('value', t));
 let selectedTeams = ['Los Angeles Lakers', 'Boston Celtics'];  // default selection
 let selectedMetric = 'pace';
 
+const teamLogos = {
+    'Atlanta Hawks': 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png',
+    'Boston Celtics': 'https://a.espncdn.com/i/teamlogos/nba/500/bos.png',
+    'Brooklyn Nets': 'https://a.espncdn.com/i/teamlogos/nba/500/bkn.png',
+    'Charlotte Hornets': 'https://a.espncdn.com/i/teamlogos/nba/500/cha.png',
+    'Chicago Bulls': 'https://a.espncdn.com/i/teamlogos/nba/500/chi.png',
+    'Cleveland Cavaliers': 'https://a.espncdn.com/i/teamlogos/nba/500/cle.png',
+    'Dallas Mavericks': 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png',
+    'Denver Nuggets': 'https://a.espncdn.com/i/teamlogos/nba/500/den.png',
+    'Detroit Pistons': 'https://a.espncdn.com/i/teamlogos/nba/500/det.png',
+    'Golden State Warriors': 'https://a.espncdn.com/i/teamlogos/nba/500/gs.png',
+    'Houston Rockets': 'https://a.espncdn.com/i/teamlogos/nba/500/hou.png',
+    'Indiana Pacers': 'https://a.espncdn.com/i/teamlogos/nba/500/ind.png',
+    'Los Angeles Clippers': 'https://a.espncdn.com/i/teamlogos/nba/500/lac.png',
+    'Los Angeles Lakers': 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
+    'Memphis Grizzlies': 'https://a.espncdn.com/i/teamlogos/nba/500/mem.png',
+    'Miami Heat': 'https://a.espncdn.com/i/teamlogos/nba/500/mia.png',
+    'Milwaukee Bucks': 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png',
+    'Minnesota Timberwolves': 'https://a.espncdn.com/i/teamlogos/nba/500/min.png',
+    'New Orleans Pelicans': 'https://a.espncdn.com/i/teamlogos/nba/500/no.png',
+    'New York Knicks': 'https://a.espncdn.com/i/teamlogos/nba/500/ny.png',
+    'Oklahoma City Thunder': 'https://a.espncdn.com/i/teamlogos/nba/500/okc.png',
+    'Orlando Magic': 'https://a.espncdn.com/i/teamlogos/nba/500/orl.png',
+    'Philadelphia 76ers': 'https://a.espncdn.com/i/teamlogos/nba/500/phi.png',
+    'Phoenix Suns': 'https://a.espncdn.com/i/teamlogos/nba/500/phx.png',
+    'Portland Trail Blazers': 'https://a.espncdn.com/i/teamlogos/nba/500/por.png',
+    'Sacramento Kings': 'https://a.espncdn.com/i/teamlogos/nba/500/sac.png',
+    'San Antonio Spurs': 'https://a.espncdn.com/i/teamlogos/nba/500/sa.png',
+    'Toronto Raptors': 'https://a.espncdn.com/i/teamlogos/nba/500/tor.png',
+    'Utah Jazz': 'https://a.espncdn.com/i/teamlogos/nba/500/utah.png',
+    'Washington Wizards': 'https://a.espncdn.com/i/teamlogos/nba/500/wsh.png'
+};
+
+function teamAbbrev(teamName) {
+    return teamName.split(' ').map(part => part[0]).join('').slice(0, 3).toUpperCase();
+}
+
+function updateTeamLogos() {
+    const logoStrip = d3.select('#team-logos');
+    const logoData = selectedTeams.slice(0, 8);
+
+    const chips = logoStrip.selectAll('.logo-chip')
+        .data(logoData, d => d)
+        .join('div')
+        .attr('class', 'logo-chip')
+        .attr('title', d => d);
+
+    chips.each(function(teamName) {
+        const chip = d3.select(this);
+        chip.selectAll('*').remove();
+        const logoSrc = teamLogos[teamName];
+        if (logoSrc) {
+            chip.append('img').attr('src', logoSrc).attr('alt', `${teamName} logo`);
+        } else {
+            chip.append('span').attr('class', 'fallback-text').text(teamAbbrev(teamName));
+        }
+    });
+}
+
+select.selectAll('option')
+    .property('selected', function() { return selectedTeams.includes(this.value); });
+
 const color = d3.scaleOrdinal(d3.schemeTableau10).domain(teams);
 
 function renderChart(data){
@@ -268,6 +330,7 @@ function renderChart(data){
 // team select listener
 d3.select('#team-select').on('change', function() {
   selectedTeams = Array.from(this.selectedOptions).map(o => o.value);
+  updateTeamLogos();
   d3.select('#chart svg').remove();  // clear old chart
   renderChart(data);
 });
@@ -341,12 +404,20 @@ function renderMap(mapData){
     const path = d3.geoPath().projection(projection);
 
     d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(us => {
+        const states = topojson.feature(us, us.objects.states).features;
+        const stateColor = d3.scaleLinear()
+            .domain([-125, -66])
+            .range(['#d9ecff', '#ffe7d4']);
+
         svg.append('g')
             .selectAll('path')
-            .data(topojson.feature(us, us.objects.states).features)
+            .data(states)
             .join('path')
             .attr('d', path)
-            .attr('fill', '#e8e8e8')
+            .attr('fill', d => {
+                const c = d3.geoCentroid(d);
+                return stateColor(c[0]);
+            })
             .attr('stroke', '#fff')
             .attr('stroke-width', 0.5);
          const tooltip = d3.select('body')
@@ -397,6 +468,9 @@ function renderMap(mapData){
                     selectedTeams.splice(idx, 1);   // remove if already selected
                 }
 
+                select.selectAll('option')
+                    .property('selected', function() { return selectedTeams.includes(this.value); });
+                updateTeamLogos();
 
             // update circle opacity to reflect selection
                 circles.attr('opacity', t =>
@@ -418,3 +492,4 @@ function renderMap(mapData){
 
 renderMap(data);
 renderChart(data);
+updateTeamLogos();
