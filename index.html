@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <script src="visualization.js" type='module'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 
 
     <title>Wemby Climate NBA Project</title>
@@ -21,10 +22,13 @@
         <label><input type="radio" name="metric" value="pace" checked> Pace</label>
         <label><input type="radio" name="metric" value="fga_per_game"> FGA/G</label>
         <label><input type="radio" name="metric" value="x3pa_per_game"> 3PA/G</label>
-        <label><input type="radio" name="metric" value="wins"> Wins</label>
+        <label><input type="radio" name="metric" value="wins">Wins</label>
     </div>
     </div>
 
-    <svg id="chart"></svg>
+    <div id = "dashboard">
+        <svg id ="map"></svg>
+        <svg id="chart"></svg>
+    </div>
 </body>
 </html>

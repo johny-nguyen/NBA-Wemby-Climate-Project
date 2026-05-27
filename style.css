@@ -1,7 +1,4 @@
-#chart{
-    width: 100%;
-    height: 500px;
-}
+
 
 .grid line {
   stroke: rgb(100, 99, 99);
@@ -11,4 +8,38 @@
 
 .grid .domain {
   display: none;
+}
+
+
+#dashboard{
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px;
+    height: calc(100vh - 40px);  /* full height minus controls */
+    width: 100%;
+}
+
+#map{
+  flex: 3;
+  height: 100%;
+  min-width: 0;
+}
+
+#map svg {
+    width: 100%;
+    height: 100%;
+}
+
+#chart{
+  flex: 2;
+  height: 100%;
+  min-width: 0;
+}
+
+
+#chart svg {
+    width: 100%;
+    height: 100%;
 }
