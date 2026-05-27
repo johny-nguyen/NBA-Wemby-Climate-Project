@@ -4,24 +4,146 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Writeup</title>
+    <style>
+        /* Reusing your project's color palette */
+        :root {
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+            --text: #1d2735;
+            --muted: #5f6c7b;
+            --accent: #1f6bc4;
+            --border: #d7dfeb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Avenir Next", "Segoe UI", sans-serif;
+            color: var(--text);
+            /* Matching your radial gradient background */
+            background: radial-gradient(circle at 15% 10%, #e8f2ff, #f4f7fb 35%, #edf2f8 100%);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Container styling to create a clean, modern card */
+        #writeup {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px;
+            max-width: 980px; 
+            width: 100%;
+            box-shadow: 0 8px 30px rgba(29, 39, 53, 0.06);
+            position: relative; /* Helps position elements inside */
+        }
+
+        /* --- Navigation Button Styles --- */
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            margin-bottom: 32px;
+            border-radius: 8px;
+            background-color: var(--accent);
+            color: #FFFFFF;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .nav-button:hover {
+            background-color: #175399; /* Slightly darker accent blue */
+            transform: translateY(-2px);
+        }
+
+        #writeup h1 {
+            margin-top: 0;
+            margin-bottom: 32px;
+            font-size: 2.5rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        /* Larger, accent-colored subheadings */
+        .writeup-content h2 {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-top: 36px;
+            margin-bottom: 12px;
+        }
+
+        /* Larger text size and increased line height for legibility */
+        .writeup-content p {
+            color: var(--muted);
+            font-size: 1.15rem;
+            line-height: 1.7;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            #writeup { 
+                padding: 24px; 
+            }
+            #writeup h1 { 
+                font-size: 2rem; 
+            }
+            .nav-button {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Project Writeup</h1>
 
-    <h2>Overview</h2>
-    <p>
-        Our team’s final project aims to create an interactive data visualization experience that helps users better understand patterns and insights within our chosen dataset through engaging and intuitive visual storytelling. We plan to use D3.js to build dynamic and interactive components that allow users to explore the data from multiple perspectives, following the course requirement of publishing an interactive web visualization.
-    </p>
+    <main id="writeup">
+        <a href="index.html" class="nav-button">
+            ← Back to Dashboard
+        </a>
 
-    <h2>Progress</h2>
-    <p>
-        So far, we have gathered and cleaned our dataset, explored possible research questions, and begun designing the structure and layout of our visualizations. We have also started implementing the foundational components of the website, including initial charts, interaction ideas, and navigation flow.
-    </p>
+        <h1>Project Writeup</h1>
+        
+        <div class="writeup-content">
+            <h2>Overview</h2>
+            <p>
+                Our team’s final project aims to create an interactive data visualization experience 
+                that helps users better understand patterns and insights within our chosen dataset 
+                through engaging and intuitive visual storytelling. We plan to use D3.js to build 
+                dynamic and interactive components that allow users to explore the data from multiple 
+                perspectives, following the course requirement of publishing an interactive web visualization.
+            </p>
 
-    <h2>Challenges</h2>
-    <p>
-        One of the biggest challenges of this project will be balancing visual complexity with clarity. Since interactive visualizations can easily become overwhelming, we want to ensure that users can meaningfully explore the data without confusion. Another challenge will be implementing smooth and responsive D3.js interactions while maintaining good performance and accessibility across the webpage.
-    </p>
+            <h2>Progress</h2>
+            <p>
+                So far, we have gathered and cleaned our dataset, explored possible research questions, 
+                and begun designing the structure and layout of our visualizations. We have also started 
+                implementing the foundational components of the website, including initial charts, interaction
+                 ideas, and navigation flow.
+            </p>
+
+            <h2>Challenges</h2>
+            <p>
+                One of the biggest challenges of this project will be balancing visual complexity with clarity. 
+                Since interactive visualizations can easily become overwhelming, we want to ensure that users 
+                can meaningfully explore the data without confusion. Another challenge will be implementing smooth
+                 and responsive D3.js interactions while maintaining good performance and accessibility across the 
+                 webpage.
+            </p>
+        </div>
+    </main>
 
 </body>
 </html>
