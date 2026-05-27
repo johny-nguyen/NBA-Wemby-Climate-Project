@@ -40,6 +40,7 @@ teams.forEach(t => select.append('option').text(t).attr('value', t));
 // selected state
 let selectedTeams = ['Los Angeles Lakers', 'Boston Celtics'];  // default selection
 let selectedMetric = 'pace';
+const fixedTopLogos = ['Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', 'Charlotte Hornets'];
 
 const teamLogos = {
     'Atlanta Hawks': 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png',
@@ -80,7 +81,7 @@ function teamAbbrev(teamName) {
 
 function updateTeamLogos() {
     const logoStrip = d3.select('#team-logos');
-    const logoData = selectedTeams.slice(0, 8);
+    const logoData = [...new Set([...fixedTopLogos, ...selectedTeams])].slice(0, 10);
 
     const chips = logoStrip.selectAll('.logo-chip')
         .data(logoData, d => d)
@@ -405,9 +406,16 @@ function renderMap(mapData){
 
     d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(us => {
         const states = topojson.feature(us, us.objects.states).features;
-        const stateColor = d3.scaleLinear()
+        const stateColor = d3.scaleSequential()
             .domain([-125, -66])
-            .range(['#d9ecff', '#ffe7d4']);
+            .interpolator(d3.interpolateRgbBasis(['#2f5d8a', '#4f9cb8', '#7ecf9a', '#f4c061', '#d9784d']));
+
+        svg.append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', width)
+            .attr('height', height)
+            .attr('fill', '#d6e9f7');
 
         svg.append('g')
             .selectAll('path')
@@ -418,8 +426,8 @@ function renderMap(mapData){
                 const c = d3.geoCentroid(d);
                 return stateColor(c[0]);
             })
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 0.5);
+            .attr('stroke', '#eef4fa')
+            .attr('stroke-width', 0.9);
          const tooltip = d3.select('body')
             .selectAll('.map-tooltip')
             .data([null])
