@@ -40,6 +40,7 @@ teams.forEach(t => select.append('option').text(t).attr('value', t));
 // selected state
 let selectedTeams = ['Los Angeles Lakers', 'Boston Celtics'];  // default selection
 let selectedMetric = 'pace';
+const fixedTopLogos = ['Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', 'Charlotte Hornets'];
 
 const teamLogos = {
     'Atlanta Hawks': 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png',
@@ -80,7 +81,7 @@ function teamAbbrev(teamName) {
 
 function updateTeamLogos() {
     const logoStrip = d3.select('#team-logos');
-    const logoData = selectedTeams.slice(0, 8);
+    const logoData = [...new Set([...fixedTopLogos, ...selectedTeams])].slice(0, 10);
 
     const chips = logoStrip.selectAll('.logo-chip')
         .data(logoData, d => d)
