@@ -31,20 +31,21 @@ body {
 
 #header-logos {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   align-items: center;
   margin: 4px 0 10px;
+  flex-wrap: wrap;
 }
 
 #header-logos img {
-  width: 48px;
-  height: 48px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   border-radius: 50%;
   background: #fff;
   border: 1px solid var(--border);
-  box-shadow: 0 2px 8px rgba(26, 41, 65, 0.12);
-  padding: 3px;
+  box-shadow: 0 1px 3px rgba(26, 41, 65, 0.12);
+  padding: 1px;
 }
 
 #graph-description {
@@ -100,8 +101,8 @@ body {
 }
 
 #team-logos .logo-chip {
-  width: 38px;
-  height: 38px;
+  width: 24px;
+  height: 24px;
   border-radius: 999px;
   background: #fff;
   border: 1px solid var(--border);
@@ -118,7 +119,7 @@ body {
 }
 
 #team-logos .fallback-text {
-  font-size: 0.6rem;
+  font-size: 0.45rem;
   font-weight: 700;
   color: var(--muted);
 }
