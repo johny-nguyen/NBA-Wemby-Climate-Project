@@ -345,7 +345,7 @@ d3.selectAll('input[name="metric"]').on('change', function() {
 
 // Map
 function renderMap(mapData){
-    const width = 1200, height = 600;
+    const width = 1200, height = 800;
     const svg = d3.select('#map')
     .append('svg')
     .attr('viewBox', `0 0 ${width} ${height}`)
