@@ -4,40 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <script src="visualization.js" type="module"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-    <title>Wemby Climate</title>
+    <title>Wemby Climate | Scrollytelling</title>
 </head>
 <body>
-    <a href="project_writeup.html" class="nav-button">Click Here to See the Project Writeup</a>
+    <div class="noise-overlay"></div>
 
-    <main class="page">
-        <header class="page-header">
+    <header id="hero">
+        <div class="hero-content glass-card">
+            <div class="badge">01 // OVERVIEW</div>
             <h1>Wemby Climate</h1>
-            <p id="graph-description">
-                The line chart compares selected NBA teams across seasons for pace, field goal attempts,
-                three-point attempts, and wins, with a dashed league-average trend for context.
-                Use the map or team selector to add and remove teams.
+            <h2>The Evolution of the NBA</h2>
+            <p>
+                With the NBA finals coming up, let’s see how much the game has progressed in the past 10 years. 
+                Scroll down to explore the data.
             </p>
-        </header>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="arrow">↓</div>
+        </div>
+    </header>
 
-        <div id="controls">
-            <select id="team-select" multiple></select>
-            <div id="metric-toggle">
-                <label><input type="radio" name="metric" value="pace" checked> Pace</label>
-                <label><input type="radio" name="metric" value="fga_per_game"> FGA/G</label>
-                <label><input type="radio" name="metric" value="x3pa_per_game"> 3PA/G</label>
-                <label><input type="radio" name="metric" value="wins"> Wins</label>
+    <main id="scrolly">
+        
+        <article class="scroll-text">
+            
+            <div class="step" data-step="1">
+                <div class="glass-card">
+                    <div class="badge">02 // EXPLORE</div>
+                    <h2>Interactive Data</h2>
+                    <p>Compare selected NBA teams across seasons. Use the dashboard on the right to isolate variables like pace, field goal attempts, and wins.</p>
+                </div>
+            </div>
+
+            <div class="step" data-step="2">
+                <div class="glass-card">
+                    <div class="badge">03 // INSIGHTS</div>
+                    <h2>Decreasing Fouls</h2>
+                    <p>As spacing increases and teams prioritize long-range shooting, the whistle is blowing less often. The game has gotten faster, but surprisingly, less physical.</p>
+                </div>
+            </div>
+
+            <div class="step" data-step="3">
+                <div class="glass-card">
+                    <div class="badge">04 // INSIGHTS</div>
+                    <h2>The 3-Point Surge</h2>
+                    <p>Three-point attempts have fundamentally changed the pace of play. Notice the league-average trendline rocketing upward over the past decade.</p>
+                </div>
+            </div>
+
+        </article>
+
+        <figure class="sticky-dashboard">
+            <div class="dashboard-wrapper glass-card">
+                
+                <div id="controls" class="glass-controls">
+                    <select id="team-select" multiple></select>
+                    <div id="metric-toggle">
+                        <label><input type="radio" name="metric" value="pace" checked> Pace</label>
+                        <label><input type="radio" name="metric" value="fga_per_game"> FGA/G</label>
+                        <label><input type="radio" name="metric" value="x3pa_per_game"> 3PA/G</label>
+                        <label><input type="radio" name="metric" value="wins"> Wins</label>
+                    </div>
+                </div>
+
+                <section id="dashboard-wrap">
+                    <div id="team-logos" aria-label="Selected team logos"></div>
+                    <div id="dashboard">
+                        <svg id="map"></svg>
+                        <svg id="chart"></svg>
+                    </div>
+                </section>
+
+            </div>
+        </figure>
+
+    </main>
+
+    <section id="writeup-section">
+        <div class="glass-card">
+            <div class="badge">05 // DOCS</div>
+            <h2>Overview</h2>
+            <p>
+                Our team’s final project aims to create an interactive data visualization experience 
+                that helps users better understand patterns and insights within our chosen dataset 
+                through engaging and intuitive visual storytelling. We plan to use D3.js to build 
+                dynamic and interactive components that allow users to explore the data from multiple 
+                perspectives, following the course requirement of publishing an interactive web visualization.
+            </p>
+            
+            <div class="writeup-content">
+                <h3>Methodology & Progress</h3>
+                <p>
+                    We made a line chart that looks at 4 different metrics (Pace, FGA/G, 3PA/G, and Wins) that you 
+                    can filter between. We also created a temporary dropdown where you can select multiple teams to 
+                    compare their stats. We also have an interactive map where you can select a team on the map that 
+                    they are based in and it would display the selected statistic on the line plot. We will also look 
+                    to add a reset button in the future and a zoom function since some teams on the map may overlap in
+                    terms of location.                
+                </p>
+
+                <h3>Challenges</h3>
+                <p>
+                    The challenging part of the project to design will probably be the website itself to make it as 
+                    explorative and immersive as possible. We want the visualization to be visually appealing 
+                    while also having it clearly convey our question and message. Additionally, making a functional 
+                    map that represents each team will be a challenge since some teams relocate or get phased out of 
+                    the league over time. This means that we have to ensure that not only are team roster changes updated, 
+                    but we also have to make sure that changes in playstyle are also clearly reflected in our visualization.                </p>
             </div>
         </div>
+    </section>
 
-        <section id="dashboard-wrap">
-            <div id="team-logos" aria-label="Selected team logos"></div>
-            <div id="dashboard">
-                <svg id="map"></svg>
-                <svg id="chart"></svg>
-            </div>
-        </section>
-    </main>
+    <script src="visualization.js" type="module"></script>
+    <script src="scrolly.js"></script>
 </body>
 </html>
