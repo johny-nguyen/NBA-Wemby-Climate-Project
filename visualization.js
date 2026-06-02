@@ -1,9 +1,8 @@
-
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
 async function loadData(){
     const [data1, data2] = await Promise.all([
-      d3.csv('team_summaries.csv', row => ({
+    d3.csv('team_summaries.csv', row => ({
         team: row.team,
         wins: +row.w,
         season: Number(row.season),
@@ -18,21 +17,20 @@ async function loadData(){
     }))
     ]);
 
-
     const lookup = new Map(data2.map(r => [`${r.team}-${r.season}`, r]));
 
     const merged = data1.map(d => ({
         ...d,
         ...(lookup.get(`${d.team}-${d.season}`) ?? {})
     }));
-  
+
     return merged;
 }
 
 let data = await loadData();
 console.log([...new Set(data.map(d => d.team))].sort());
-//Loading Team Dropdowns
-// populate team dropdown dynamically
+
+// populate team dropdown dynamically (if you still have a hidden one)
 const teams = [...new Set(data.map(d => d.team))].sort();
 const select = d3.select('#team-select');
 teams.forEach(t => select.append('option').text(t).attr('value', t));
@@ -106,32 +104,25 @@ select.selectAll('option')
 const color = d3.scaleOrdinal(d3.schemeTableau10).domain(teams);
 
 function renderChart(data){
-    const width = 800;
-    const height = 800;
+    const width = 1200;
+    const height = 600;
     const svg = d3
     .select('#chart')
     .append('svg')
     .attr('viewBox', `0 0 ${width} ${height}`)
+    .attr('width', '100%')
     .style('overflow', 'visible')
     .attr('height', '100%');
     const margin = { top: 20, right: 30, bottom: 50, left: 60 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
-
-
-
     const g = svg.append('g')
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
-
-
 
     const filtered = data.filter(d => selectedTeams.includes(d.team));
     const grouped = d3.group(filtered, d => d.team);
     
-    
-    
-
     const x = d3.scaleLinear()
         .domain(d3.extent(data, d => d.season))
         .range([0, innerWidth]);
@@ -144,8 +135,7 @@ function renderChart(data){
         .x(d => x(d.season))
         .y(d => y(d[selectedMetric]));
 
-
-    // y gridlines (append before lines so they sit behind)
+    // y gridlines
     g.append('g')
         .attr('class', 'grid')
         .call(
@@ -155,16 +145,16 @@ function renderChart(data){
             .tickFormat('')
         );
 
-  // x gridlines
-  g.append('g')
-    .attr('class', 'grid')
-    .attr('transform', `translate(0, ${innerHeight})`)
-    .call(
-      d3.axisBottom(x)
-        .ticks(8)
-        .tickSize(-innerHeight)
-        .tickFormat('')
-    );
+    // x gridlines
+    g.append('g')
+        .attr('class', 'grid')
+        .attr('transform', `translate(0, ${innerHeight})`)
+        .call(
+        d3.axisBottom(x)
+            .ticks(8)
+            .tickSize(-innerHeight)
+            .tickFormat('')
+        );
 
     // x axis
     g.append('g')
@@ -177,7 +167,6 @@ function renderChart(data){
         .attr('class', 'y-axis')
         .call(d3.axisLeft(y));
 
-    
     // bind one path per team
     g.selectAll('.team-line')
         .data(grouped, ([team]) => team)
@@ -235,8 +224,6 @@ function renderChart(data){
     })
     .on('mouseout', () => tooltip.style('opacity', 0));
 
-
-
     // tooltip
     const tooltip = d3.select('body')
     .selectAll('.tooltip')
@@ -253,30 +240,27 @@ function renderChart(data){
     .style('opacity', 0);
 
     g.selectAll('.team-points')
-    .data([...grouped])                          // one group per team
+    .data([...grouped])                          
     .join('g')
     .attr('class', 'team-points')
     .each(function([team, values]) {
     d3.select(this)
-      .selectAll('circle')
-      .data(values)
-      .join('circle')
-      .attr('cx', d => x(d.season))
-      .attr('cy', d => y(d[selectedMetric]))
-      .attr('r', 7)
-      .attr('fill', color(team))
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 1)
-      .on('mouseover', (event, d) => {
-       const [px, py] = [x(d.season), y(d[selectedMetric])];
+    .selectAll('circle')
+    .data(values)
+    .join('circle')
+    .attr('cx', d => x(d.season))
+    .attr('cy', d => y(d[selectedMetric]))
+    .attr('r', 7)
+    .attr('fill', color(team))
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 1)
+    .on('mouseover', (event, d) => {
+    const [px, py] = [x(d.season), y(d[selectedMetric])];
     const svgNode = svg.node();
     const svgRect = svgNode.getBoundingClientRect();
 
-    // Convert SVG coords → screen coords
-    const scaleX = svgRect.width  / width;   // accounts for viewBox scaling
+    const scaleX = svgRect.width  / width;   
     const scaleY = svgRect.height / height;
-    
-
     
     tooltip
         .style('opacity', 1)
@@ -286,9 +270,9 @@ function renderChart(data){
         <strong>${d.team}</strong><br/>
         Season: ${d.season}<br/>
         ${selectedMetric}: ${d[selectedMetric]?.toFixed(1)}<br/>
-          `);
-      })
-  });
+        `);
+    })
+    });
     
     const legendData = [...selectedTeams.map(t => ({ label: t, color: color(t), dashed: false })),
                         { label: 'League Avg', color: '#aaa', dashed: true }];
@@ -303,7 +287,6 @@ function renderChart(data){
     .attr('class', 'legend-row')
     .attr('transform', (d, i) => `translate(0, ${i * 24})`);
 
-    // Line swatch
     legendRows.append('line')
     .attr('x1', 0).attr('x2', 20)
     .attr('y1', 7).attr('y2', 7)
@@ -311,7 +294,6 @@ function renderChart(data){
     .attr('stroke-width', 2)
     .attr('stroke-dasharray', d => d.dashed ? '6 3' : null);
 
-    // Circle swatch
     legendRows.append('circle')
     .attr('cx', 10).attr('cy', 7)
     .attr('r', 4)
@@ -319,7 +301,6 @@ function renderChart(data){
     .attr('stroke', d => d.dashed ? 'none' : '#fff')
     .attr('stroke-width', 1);
 
-    // Label
     legendRows.append('text')
     .attr('x', 28).attr('y', 11)
     .text(d => d.label)
@@ -329,19 +310,18 @@ function renderChart(data){
 
 // team select listener
 d3.select('#team-select').on('change', function() {
-  selectedTeams = Array.from(this.selectedOptions).map(o => o.value);
-  updateTeamLogos();
-  d3.select('#chart svg').remove();  // clear old chart
-  renderChart(data);
+    selectedTeams = Array.from(this.selectedOptions).map(o => o.value);
+    updateTeamLogos();
+    d3.select('#chart svg').remove();  
+    renderChart(data);
 });
 
 // metric radio listeners
 d3.selectAll('input[name="metric"]').on('change', function() {
-  selectedMetric = this.value;
-  d3.select('#chart svg').remove();  // clear old chart
-  renderChart(data);
+    selectedMetric = this.value;
+    d3.select('#chart svg').remove();  
+    renderChart(data);
 });
-
 
 // Map
 function renderMap(mapData){
@@ -351,6 +331,14 @@ function renderMap(mapData){
     .attr('viewBox', `0 0 ${width} ${height}`)
     .attr('width', '100%')
     .attr('height', '100%');
+
+    // 1. ADD ZOOM BEHAVIOR
+    const zoom = d3.zoom()
+        .scaleExtent([1, 8]) // Zoom limits
+        .on('zoom', (event) => {
+            mapGroup.attr('transform', event.transform);
+        });
+    svg.call(zoom);
 
     const projection = d3.geoMercator()
     .center([-96, 40])
@@ -362,44 +350,43 @@ function renderMap(mapData){
     .range(['#3266ad', '#c0392b']);
 
     const nbaTeams = [
-    { id:'Boston Celtics',          name:'Boston Celtics',          city:'Boston',        coords:[-71.062,42.356],  conf:'East', div:'Atlantic',  validFrom:2000 },
-    { id:'New Jersey Nets',         name:'New Jersey Nets',         city:'Newark',        coords:[-74.171,40.733],  conf:'East', div:'Atlantic',  validFrom:2000 },
-    { id:'Brooklyn Nets',           name:'Brooklyn Nets',           city:'Brooklyn',      coords:[-73.975,40.682],  conf:'East', div:'Atlantic',  validFrom:2012 },
-    { id:'New York Knicks',         name:'New York Knicks',         city:'New York',      coords:[-73.993,40.75],   conf:'East', div:'Atlantic',  validFrom:2000 },
-    { id:'Philadelphia 76ers',      name:'Philadelphia 76ers',      city:'Philadelphia',  coords:[-75.172,39.901],  conf:'East', div:'Atlantic',  validFrom:2000 },
-    { id:'Toronto Raptors',         name:'Toronto Raptors',         city:'Toronto',       coords:[-79.38,43.643],   conf:'East', div:'Atlantic',  validFrom:2000, canada:true },
-    { id:'Chicago Bulls',           name:'Chicago Bulls',           city:'Chicago',       coords:[-87.674,41.881],  conf:'East', div:'Central',   validFrom:2000 },
-    { id:'Cleveland Cavaliers',     name:'Cleveland Cavaliers',     city:'Cleveland',     coords:[-81.688,41.496],  conf:'East', div:'Central',   validFrom:2000 },
-    { id:'Detroit Pistons',         name:'Detroit Pistons',         city:'Detroit',       coords:[-83.055,42.341],  conf:'East', div:'Central',   validFrom:2000 },
-    { id:'Indiana Pacers',          name:'Indiana Pacers',          city:'Indianapolis',  coords:[-86.155,39.764],  conf:'East', div:'Central',   validFrom:2000 },
-    { id:'Milwaukee Bucks',         name:'Milwaukee Bucks',         city:'Milwaukee',     coords:[-87.917,43.045],  conf:'East', div:'Central',   validFrom:2000 },
-    { id:'Atlanta Hawks',           name:'Atlanta Hawks',           city:'Atlanta',       coords:[-84.396,33.757],  conf:'East', div:'Southeast', validFrom:2000 },
-    { id:'Charlotte Hornets',       name:'Charlotte Hornets',       city:'Charlotte',     coords:[-80.839,35.225],  conf:'East', div:'Southeast', validFrom:2000 },
-    { id:'Charlotte Bobcats',       name:'Charlotte Bobcats',       city:'Charlotte',     coords:[-80.839,35.225],  conf:'East', div:'Southeast', validFrom:2004 },
-    { id:'Miami Heat',              name:'Miami Heat',              city:'Miami',         coords:[-80.187,25.781],  conf:'East', div:'Southeast', validFrom:2000 },
-    { id:'Orlando Magic',           name:'Orlando Magic',           city:'Orlando',       coords:[-81.383,28.539],  conf:'East', div:'Southeast', validFrom:2000 },
-    { id:'Washington Wizards',      name:'Washington Wizards',      city:'Washington',    coords:[-77.021,38.898],  conf:'East', div:'Southeast', validFrom:2000 },
-    { id:'Denver Nuggets',          name:'Denver Nuggets',          city:'Denver',        coords:[-104.99,39.748],  conf:'West', div:'Northwest', validFrom:2000 },
-    { id:'Minnesota Timberwolves',  name:'Minnesota Timberwolves',  city:'Minneapolis',   coords:[-93.276,44.979],  conf:'West', div:'Northwest', validFrom:2000 },
-    { id:'Seattle SuperSonics',     name:'Seattle SuperSonics',     city:'Seattle',       coords:[-122.333,47.622], conf:'West', div:'Northwest', validFrom:2000 },
-    { id:'Oklahoma City Thunder',   name:'Oklahoma City Thunder',   city:'Oklahoma City', coords:[-97.516,35.463],  conf:'West', div:'Northwest', validFrom:2008 },
-    { id:'Portland Trail Blazers',  name:'Portland Trail Blazers',  city:'Portland',      coords:[-122.767,45.531], conf:'West', div:'Northwest', validFrom:2000 },
-    { id:'Utah Jazz',               name:'Utah Jazz',               city:'Salt Lake City',coords:[-111.901,40.768], conf:'West', div:'Northwest', validFrom:2000 },
-    { id:'Golden State Warriors',   name:'Golden State Warriors',   city:'San Francisco', coords:[-122.387,37.768], conf:'West', div:'Pacific',   validFrom:2000 },
-    { id:'Los Angeles Clippers',    name:'Los Angeles Clippers',    city:'Los Angeles',   coords:[-118.338,34.043], conf:'West', div:'Pacific',   validFrom:2000 },
-    { id:'Los Angeles Lakers',      name:'Los Angeles Lakers',      city:'Los Angeles',   coords:[-118.268,34.01],  conf:'West', div:'Pacific',   validFrom:2000 },
-    { id:'Phoenix Suns',            name:'Phoenix Suns',            city:'Phoenix',       coords:[-112.071,33.446], conf:'West', div:'Pacific',   validFrom:2000 },
-    { id:'Sacramento Kings',        name:'Sacramento Kings',        city:'Sacramento',    coords:[-121.499,38.58],  conf:'West', div:'Pacific',   validFrom:2000 },
-    { id:'Dallas Mavericks',        name:'Dallas Mavericks',        city:'Dallas',        coords:[-96.81,32.79],    conf:'West', div:'Southwest', validFrom:2000 },
-    { id:'Houston Rockets',         name:'Houston Rockets',         city:'Houston',       coords:[-95.362,29.751],  conf:'West', div:'Southwest', validFrom:2000 },
-    { id:'Memphis Grizzlies',       name:'Memphis Grizzlies',       city:'Memphis',       coords:[-90.05,35.138],   conf:'West', div:'Southwest', validFrom:2000 },
-    { id:'Vancouver Grizzlies',     name:'Vancouver Grizzlies',     city:'Vancouver',     coords:[-123.116,49.246], conf:'West', div:'Southwest', validFrom:2000, canada:true },
-    { id:'New Orleans Pelicans',    name:'New Orleans Pelicans',    city:'New Orleans',   coords:[-90.082,29.949],  conf:'West', div:'Southwest', validFrom:2013 },
-    { id:'New Orleans Hornets',     name:'New Orleans Hornets',     city:'New Orleans',   coords:[-90.082,29.949],  conf:'West', div:'Southwest', validFrom:2002 },
-    { id:'New Orleans/Oklahoma City Hornets', name:'New Orleans/Oklahoma City Hornets', city:'New Orleans', coords:[-90.082,29.949], conf:'West', div:'Southwest', validFrom:2005 },
-    { id:'San Antonio Spurs',       name:'San Antonio Spurs',       city:'San Antonio',   coords:[-98.438,29.427],  conf:'West', div:'Southwest', validFrom:2000 },
-];
-
+        { id:'Boston Celtics',          name:'Boston Celtics',          city:'Boston',        coords:[-71.062,42.356],  conf:'East', div:'Atlantic',  validFrom:2000 },
+        { id:'New Jersey Nets',         name:'New Jersey Nets',         city:'Newark',        coords:[-74.171,40.733],  conf:'East', div:'Atlantic',  validFrom:2000 },
+        { id:'Brooklyn Nets',           name:'Brooklyn Nets',           city:'Brooklyn',      coords:[-73.975,40.682],  conf:'East', div:'Atlantic',  validFrom:2012 },
+        { id:'New York Knicks',         name:'New York Knicks',         city:'New York',      coords:[-73.993,40.75],   conf:'East', div:'Atlantic',  validFrom:2000 },
+        { id:'Philadelphia 76ers',      name:'Philadelphia 76ers',      city:'Philadelphia',  coords:[-75.172,39.901],  conf:'East', div:'Atlantic',  validFrom:2000 },
+        { id:'Toronto Raptors',         name:'Toronto Raptors',         city:'Toronto',       coords:[-79.38,43.643],   conf:'East', div:'Atlantic',  validFrom:2000, canada:true },
+        { id:'Chicago Bulls',           name:'Chicago Bulls',           city:'Chicago',       coords:[-87.674,41.881],  conf:'East', div:'Central',   validFrom:2000 },
+        { id:'Cleveland Cavaliers',     name:'Cleveland Cavaliers',     city:'Cleveland',     coords:[-81.688,41.496],  conf:'East', div:'Central',   validFrom:2000 },
+        { id:'Detroit Pistons',         name:'Detroit Pistons',         city:'Detroit',       coords:[-83.055,42.341],  conf:'East', div:'Central',   validFrom:2000 },
+        { id:'Indiana Pacers',          name:'Indiana Pacers',          city:'Indianapolis',  coords:[-86.155,39.764],  conf:'East', div:'Central',   validFrom:2000 },
+        { id:'Milwaukee Bucks',         name:'Milwaukee Bucks',         city:'Milwaukee',     coords:[-87.917,43.045],  conf:'East', div:'Central',   validFrom:2000 },
+        { id:'Atlanta Hawks',           name:'Atlanta Hawks',           city:'Atlanta',       coords:[-84.396,33.757],  conf:'East', div:'Southeast', validFrom:2000 },
+        { id:'Charlotte Hornets',       name:'Charlotte Hornets',       city:'Charlotte',     coords:[-80.839,35.225],  conf:'East', div:'Southeast', validFrom:2000 },
+        { id:'Charlotte Bobcats',       name:'Charlotte Bobcats',       city:'Charlotte',     coords:[-80.839,35.225],  conf:'East', div:'Southeast', validFrom:2004 },
+        { id:'Miami Heat',              name:'Miami Heat',              city:'Miami',         coords:[-80.187,25.781],  conf:'East', div:'Southeast', validFrom:2000 },
+        { id:'Orlando Magic',           name:'Orlando Magic',           city:'Orlando',       coords:[-81.383,28.539],  conf:'East', div:'Southeast', validFrom:2000 },
+        { id:'Washington Wizards',      name:'Washington Wizards',      city:'Washington',    coords:[-77.021,38.898],  conf:'East', div:'Southeast', validFrom:2000 },
+        { id:'Denver Nuggets',          name:'Denver Nuggets',          city:'Denver',        coords:[-104.99,39.748],  conf:'West', div:'Northwest', validFrom:2000 },
+        { id:'Minnesota Timberwolves',  name:'Minnesota Timberwolves',  city:'Minneapolis',   coords:[-93.276,44.979],  conf:'West', div:'Northwest', validFrom:2000 },
+        { id:'Seattle SuperSonics',     name:'Seattle SuperSonics',     city:'Seattle',       coords:[-122.333,47.622], conf:'West', div:'Northwest', validFrom:2000 },
+        { id:'Oklahoma City Thunder',   name:'Oklahoma City Thunder',   city:'Oklahoma City', coords:[-97.516,35.463],  conf:'West', div:'Northwest', validFrom:2008 },
+        { id:'Portland Trail Blazers',  name:'Portland Trail Blazers',  city:'Portland',      coords:[-122.767,45.531], conf:'West', div:'Northwest', validFrom:2000 },
+        { id:'Utah Jazz',               name:'Utah Jazz',               city:'Salt Lake City',coords:[-111.901,40.768], conf:'West', div:'Northwest', validFrom:2000 },
+        { id:'Golden State Warriors',   name:'Golden State Warriors',   city:'San Francisco', coords:[-122.387,37.768], conf:'West', div:'Pacific',   validFrom:2000 },
+        { id:'Los Angeles Clippers',    name:'Los Angeles Clippers',    city:'Los Angeles',   coords:[-118.338,34.043], conf:'West', div:'Pacific',   validFrom:2000 },
+        { id:'Los Angeles Lakers',      name:'Los Angeles Lakers',      city:'Los Angeles',   coords:[-118.268,34.01],  conf:'West', div:'Pacific',   validFrom:2000 },
+        { id:'Phoenix Suns',            name:'Phoenix Suns',            city:'Phoenix',       coords:[-112.071,33.446], conf:'West', div:'Pacific',   validFrom:2000 },
+        { id:'Sacramento Kings',        name:'Sacramento Kings',        city:'Sacramento',    coords:[-121.499,38.58],  conf:'West', div:'Pacific',   validFrom:2000 },
+        { id:'Dallas Mavericks',        name:'Dallas Mavericks',        city:'Dallas',        coords:[-96.81,32.79],    conf:'West', div:'Southwest', validFrom:2000 },
+        { id:'Houston Rockets',         name:'Houston Rockets',         city:'Houston',       coords:[-95.362,29.751],  conf:'West', div:'Southwest', validFrom:2000 },
+        { id:'Memphis Grizzlies',       name:'Memphis Grizzlies',       city:'Memphis',       coords:[-90.05,35.138],   conf:'West', div:'Southwest', validFrom:2000 },
+        { id:'Vancouver Grizzlies',     name:'Vancouver Grizzlies',     city:'Vancouver',     coords:[-123.116,49.246], conf:'West', div:'Southwest', validFrom:2000, canada:true },
+        { id:'New Orleans Pelicans',    name:'New Orleans Pelicans',    city:'New Orleans',   coords:[-90.082,29.949],  conf:'West', div:'Southwest', validFrom:2013 },
+        { id:'New Orleans Hornets',     name:'New Orleans Hornets',     city:'New Orleans',   coords:[-90.082,29.949],  conf:'West', div:'Southwest', validFrom:2002 },
+        { id:'New Orleans/Oklahoma City Hornets', name:'New Orleans/Oklahoma City Hornets', city:'New Orleans', coords:[-90.082,29.949], conf:'West', div:'Southwest', validFrom:2005 },
+        { id:'San Antonio Spurs',       name:'San Antonio Spurs',       city:'San Antonio',   coords:[-98.438,29.427],  conf:'West', div:'Southwest', validFrom:2000 },
+    ];
 
     const path = d3.geoPath().projection(projection);
 
@@ -409,6 +396,7 @@ function renderMap(mapData){
             .domain([-125, -66])
             .interpolator(d3.interpolateRgbBasis(['#2f5d8a', '#4f9cb8', '#7ecf9a', '#f4c061', '#d9784d']));
 
+        // This invisible/ocean rect catches the zoom events perfectly
         svg.append('rect')
             .attr('x', 0)
             .attr('y', 0)
@@ -416,7 +404,11 @@ function renderMap(mapData){
             .attr('height', height)
             .attr('fill', '#d6e9f7');
 
-        svg.append('g')
+        // 2. CREATE A GROUP FOR MAP LAYER (so it can be zoomed)
+        const mapGroup = svg.append('g').attr('class', 'map-layer');
+
+        // Append paths to mapGroup instead of svg
+        mapGroup.append('g')
             .selectAll('path')
             .data(states)
             .join('path')
@@ -427,7 +419,8 @@ function renderMap(mapData){
             })
             .attr('stroke', '#eef4fa')
             .attr('stroke-width', 0.9);
-         const tooltip = d3.select('body')
+
+        const tooltip = d3.select('body')
             .selectAll('.map-tooltip')
             .data([null])
             .join('div')
@@ -441,7 +434,8 @@ function renderMap(mapData){
             .style('pointer-events', 'none')
             .style('opacity', 0);
 
-       const circles =  svg.append('g')
+        // Append circles to mapGroup instead of svg
+        const circles = mapGroup.append('g')
             .selectAll('circle')
             .data(nbaTeams)
             .join('circle')
@@ -489,11 +483,32 @@ function renderMap(mapData){
                 // redraw chart
                 d3.select('#chart svg').remove();
                 renderChart(mapData);
-        
-    });
+        });
 
-    circles.attr('opacity', d => selectedTeams.includes(d.id) ? 1 : 0.3)
-               .attr('r', d => selectedTeams.includes(d.id) ? 11 : 8);
+        circles.attr('opacity', d => selectedTeams.includes(d.id) ? 1 : 0.3)
+                .attr('r', d => selectedTeams.includes(d.id) ? 11 : 8);
+
+        // 3. RESET BUTTON LOGIC
+        d3.select('#reset-map-btn').on('click', () => {
+            // Empty selection
+            selectedTeams = []; 
+            updateTeamLogos();
+            select.selectAll('option').property('selected', false);
+
+            // Reset circles visually
+            circles.transition().duration(300)
+                .attr('opacity', 0.3)
+                .attr('r', 8);
+
+            // Clear the chart (it will just be an empty chart since selectedTeams is empty)
+            d3.select('#chart svg').remove();
+            renderChart(mapData); 
+
+            // Smoothly animate the map back to default zoom/pan
+            svg.transition()
+               .duration(750) 
+               .call(zoom.transform, d3.zoomIdentity);
+        });
     });
 }
 

@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-    <title>Wemby Climate | Scrollytelling</title>
+    <title>Wemby Climate</title>
 </head>
 <body>
     <div class="noise-overlay"></div>
@@ -44,42 +45,54 @@
             </p>
         </div>
     </section>
-
-    <main id="scrolly">
-        
-        <article class="scroll-text">
+    <!-- NEW SEPARATE MAP SECTION -->
+    <section id="map-section">
+        <div class="glass-card" style="position: relative; height: 80vh; display: flex; flex-direction: column;">
+            <div class="badge">04 // GEOGRAPHY</div>
+            <h2 style="margin-bottom: 8px;">Select Your Teams</h2>
+            <p style="margin-bottom: 24px; font-size: 1rem;">Click on the map to select teams. Scroll down to see their historical trends.</p>
             
+            <div id="map" style="flex-grow: 1; min-height: 0; border-radius: 16px; overflow: hidden; background: rgba(0,0,0,0.2); border: 1px solid var(--border);"></div>
+            
+            <button id="reset-map-btn" class="glass-button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                </svg>
+                Reset Map
+            </button>
+        </div>
+    </section>
+
+    <!-- SCROLLYTELLING SECTION (Now strictly for the Chart) -->
+    <main id="scrolly">
+        <article class="scroll-text">
             <div class="step" data-step="1">
                 <div class="glass-card">
-                    <div class="badge">04 // EXPLORE</div>
+                    <div class="badge">05 // EXPLORE</div>
                     <h2>Interactive Data</h2>
-                    <p>Compare selected NBA teams across seasons. Use the dashboard on the right to isolate variables like pace, field goal attempts, and wins.</p>
+                    <p>Compare your selected NBA teams across seasons. Use the toggles above the chart to isolate variables like pace, field goal attempts, and wins.</p>
                 </div>
             </div>
-
             <div class="step" data-step="2">
                 <div class="glass-card">
-                    <div class="badge">05 // INSIGHTS</div>
+                    <div class="badge">06 // INSIGHTS</div>
                     <h2>Decreasing Fouls</h2>
                     <p>As spacing increases and teams prioritize long-range shooting, the whistle is blowing less often. The game has gotten faster, but surprisingly, less physical.</p>
                 </div>
             </div>
-
             <div class="step" data-step="3">
                 <div class="glass-card">
-                    <div class="badge">06 // INSIGHTS</div>
+                    <div class="badge">07 // INSIGHTS</div>
                     <h2>The 3-Point Surge</h2>
                     <p>Three-point attempts have fundamentally changed the pace of play. Notice the league-average trendline rocketing upward over the past decade.</p>
                 </div>
             </div>
-
         </article>
 
         <figure class="sticky-dashboard">
             <div class="dashboard-wrapper glass-card">
-                
                 <div id="controls" class="glass-controls">
-                    <select id="team-select" multiple></select>
                     <div id="metric-toggle">
                         <label><input type="radio" name="metric" value="pace" checked> Pace</label>
                         <label><input type="radio" name="metric" value="fga_per_game"> FGA/G</label>
@@ -88,17 +101,15 @@
                     </div>
                 </div>
 
-                <section id="dashboard-wrap">
+                <section id="dashboard-wrap" style="display: flex; flex-direction: column;">
                     <div id="team-logos" aria-label="Selected team logos"></div>
                     <div id="dashboard">
-                        <svg id="map"></svg>
-                        <svg id="chart"></svg>
+                        <!-- THE CHART IS NOW THE ONLY THING HERE -->
+                        <div id="chart" style="flex: 1; height: 100%;"></div>
                     </div>
                 </section>
-
             </div>
         </figure>
-
     </main>
 
     <section id="writeup-section">
