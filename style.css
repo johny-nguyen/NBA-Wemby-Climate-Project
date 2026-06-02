@@ -40,6 +40,49 @@ body {
   background-attachment: fixed; /* Creates a slight parallax effect */
 }
 
+.hero-content h2 {
+  font-size: 2.5rem; /* Increased from the standard 2rem */
+  margin-bottom: 24px;
+}
+
+.hero-content p {
+  font-size: 1.5rem; /* Increased from the standard 1.15rem */
+  line-height: 1.6;
+  color: var(--text); /* Uses the brighter white instead of the muted grey */
+  max-width: 800px; /* Keeps the lines from getting too wide to read */
+}
+
+/* --- CONTEXT SECTION (Question & Dataset) --- */
+#context-section {
+  max-width: 1400px;
+  margin: 10vh auto;
+  padding: 0 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  position: relative;
+  z-index: 10;
+}
+
+#context-section .glass-card {
+  /* Overrides the default max-width so they fill the grid evenly */
+  max-width: 100%; 
+  margin: 0;
+}
+
+#context-section strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Mobile responsiveness for the new section */
+@media (max-width: 1000px) {
+  #context-section {
+    grid-template-columns: 1fr; /* Stacks the cards on smaller screens */
+    padding: 0 20px;
+  }
+}
+
 .scroll-indicator {
   position: absolute;
   bottom: 40px;
