@@ -216,6 +216,27 @@ body {
 }
 
 /* --- GLASSMORPHISM COMPONENTS --- */
+/* Custom Call-out Box for Key Insights */
+.takeaway-box {
+    margin-top: 24px;
+    padding: 16px 20px;
+    background: rgba(255, 69, 0, 0.08); /* Faint glow using your neon orange accent */
+    border-left: 4px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text);
+}
+
+.takeaway-box strong {
+    display: block;
+    color: var(--accent);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
 .glass-card {
   background: var(--surface);
   backdrop-filter: blur(16px);
