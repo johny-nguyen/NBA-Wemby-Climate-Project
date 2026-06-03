@@ -1,6 +1,7 @@
 const HERO_VIDEO_ID = 'hUOfC2ilXak';
 
 let heroPlayer;
+let loopWatcher;
 
 function loadYouTubeApi() {
   if (window.YT?.Player) {
@@ -35,15 +36,33 @@ function createHeroPlayer() {
       onReady: event => {
         event.target.mute();
         event.target.playVideo();
+        startLoopWatcher(event.target);
       },
       onStateChange: event => {
         if (event.data === YT.PlayerState.ENDED) {
-          event.target.seekTo(0);
-          event.target.playVideo();
+          restartHeroVideo(event.target);
         }
       }
     }
   });
+}
+
+function restartHeroVideo(player) {
+  player.seekTo(0, true);
+  player.playVideo();
+}
+
+function startLoopWatcher(player) {
+  clearInterval(loopWatcher);
+
+  loopWatcher = setInterval(() => {
+    const duration = player.getDuration?.() || 0;
+    const currentTime = player.getCurrentTime?.() || 0;
+
+    if (duration > 0 && currentTime >= duration - 0.4) {
+      restartHeroVideo(player);
+    }
+  }, 500);
 }
 
 window.onYouTubeIframeAPIReady = createHeroPlayer;
