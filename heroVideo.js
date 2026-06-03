@@ -15,6 +15,8 @@ function loadYouTubeApi() {
 
 function createHeroPlayer() {
   heroPlayer = new YT.Player('hero-player', {
+    width: '100%',
+    height: '100%',
     videoId: HERO_VIDEO_ID,
     playerVars: {
       autoplay: 1,
