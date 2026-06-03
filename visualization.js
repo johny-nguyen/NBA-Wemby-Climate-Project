@@ -7,7 +7,8 @@ async function loadData(){
         wins: +row.w,
         season: Number(row.season),
         pace: Number(row.pace),
-        playoffs: row.playoffs === 'True' 
+        playoffs: row.playoffs === 'True',
+        age: Number(row.age)
     })),
     d3.csv('team_stats_per_game.csv', row => ({
         team: row.team,
@@ -71,7 +72,7 @@ const teamLogos = {
     'San Antonio Spurs': 'https://a.espncdn.com/i/teamlogos/nba/500/sa.png',
     'Toronto Raptors': 'https://a.espncdn.com/i/teamlogos/nba/500/tor.png',
     'Utah Jazz': 'https://a.espncdn.com/i/teamlogos/nba/500/utah.png',
-    'Washington Wizards': 'https://a.espncdn.com/i/teamlogos/nba/500/wsh.png'
+    'Washington Wizards': 'https://a.espncdn.com/i/teamlogos/nba/500/wsh.png',
 };
 
 function teamAbbrev(teamName) {
@@ -236,21 +237,23 @@ function updateChart(chartData) {
 
     // Tooltip Mouseover Function
     const handleMouseover = function(event, d) {
-        const px = x(d.season);
-        const py = y(d[selectedMetric]);
-        const svgRect = chartSvg.node().getBoundingClientRect();
-        const scaleX = svgRect.width  / width;   
-        const scaleY = svgRect.height / height;
+        // const px = x(d.season);
+        // const py = y(d[selectedMetric]);
+        // const svgRect = chartSvg.node().getBoundingClientRect();
+        // const scaleX = svgRect.width  / width;   
+        // const scaleY = svgRect.height / height;
         
         tooltip
-            .style('opacity', 1)
-            .style('left', `${svgRect.left + (margin.left + px) * scaleX + 12}px`)
-            .style('top',  `${svgRect.top  + (margin.top  + py) * scaleY - 28}px`)
-            .html(`
-            <strong>${d.team || 'League Avg'}</strong><br/>
-            Season: ${d.season}<br/>
-            ${selectedMetric}: ${d[selectedMetric]?.toFixed(1)}<br/>
-            `);
+        .style('opacity', 1)
+        .style('left', `${event.pageX + 12}px`)
+        .style('top', `${event.pageY - 28}px`)
+        .html(`
+        <strong>${d.team || 'League Avg'}</strong><br/>
+        Season: ${d.season}<br/>
+        ${selectedMetric}: ${d[selectedMetric]?.toFixed(1)}<br/>
+        ${selectedMetric === 'wins' && d.age != null ? `Avg Age: ${d.age.toFixed(1)}` : ''}
+        ${d.playoffs !== undefined ? (d.playoffs ? '🏆 Playoff team' : '❌ Missed playoffs') : ''}
+        `);
     };
 
     // Animate Average Points
@@ -289,7 +292,7 @@ function updateChart(chartData) {
                 .attr('cx', d => x(d.season))
                 .attr('cy', d => y(d[selectedMetric]))
                 .attr('r', 7)
-                .attr('fill', d => color(d.team))
+                .attr('fill', d => d.playoffs ? color(d.team) : '#444')
                 .attr('stroke', '#fff')
                 .attr('stroke-width', 1)
                 .attr('opacity', 0)
@@ -470,18 +473,20 @@ function renderMap(mapData){
             .join('circle')
             .attr('cx', d => projection(d.coords)[0])
             .attr('cy', d => projection(d.coords)[1])
-            .attr('r', 8)
+            .attr('r', 20)
             .attr('fill', d => color(d.conf))
             .attr('stroke', '#fff')
             .attr('stroke-width', 1.5)
             .attr('opacity', 0.85)
             .on('mouseover', (event, d) => {
-            tooltip
-                .style('opacity', 1)
-                .html(`
-                    <strong>${d.name}</strong><br/>
-                    ${d.city} · ${d.conf}ern Conference
-                `);
+                const logo = teamLogos[d.id];
+                tooltip
+                    .style('opacity', 1)
+                    .html(`
+                        ${logo ? `<img src="${logo}" style="width:40px;height:40px;object-fit:contain;display:block;margin:0 auto 4px;">` : ''}
+                        <strong>${d.name}</strong><br/>
+                        ${d.city} · ${d.conf}ern Conference
+                    `);
             })
             .on('mousemove', (event) => {
                 tooltip
@@ -511,7 +516,7 @@ function renderMap(mapData){
                 updateChart(mapData);
             });
 
-        circles.attr('opacity', d => selectedTeams.includes(d.id) ? 1 : 0.3)
+        circles.attr('opacity', d => selectedTeams.includes(d.id) ? 1 : 0.5)
                 .attr('r', d => selectedTeams.includes(d.id) ? 11 : 8);
 
         d3.select('#reset-map-btn').on('click', () => {
@@ -595,80 +600,85 @@ function initEvolutionChart(fullData) {
             })
         ).sort((a, b) => a.season - b.season);
 
-        x.domain(d3.extent(seasonData, d => d.season));
-        y.domain([0, d3.max(seasonData, d => Math.max(d.x2pa, d.x3pa, d.fta)) + 5]);
-
-        xAxisG.transition(t).call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(10));
-        yAxisG.transition(t).call(d3.axisLeft(y));
-        gridG.transition(t).call(d3.axisLeft(y).tickSize(-innerWidth).tickFormat(''));
-
-        const series = [
-            { key: 'x2pa', label: '2-Point Attempts', color: '#4f9cb8' }, // Blue
-            { key: 'x3pa', label: '3-Point Attempts', color: '#FF4500' }, // Orange
-            { key: 'fta', label: 'Free Throw Attempts', color: '#7ecf9a' } // Green
-        ];
-
-        // Draw Lines
-        linesG.selectAll('.macro-line')
-            .data(series, d => d.key)
-            .join(
-                enter => enter.append('path')
-                    .attr('class', 'macro-line')
-                    .attr('fill', 'none')
-                    .attr('stroke', d => d.color)
-                    .attr('stroke-width', 3)
-                    .attr('d', d => d3.line().x(s => x(s.season)).y(y(0))(seasonData))
-                    .call(enter => enter.transition(t)
-                        .attr('d', d => d3.line().x(s => x(s.season)).y(s => y(s[d.key]))(seasonData))),
-                update => update.call(update => update.transition(t)
-                    .attr('d', d => d3.line().x(s => x(s.season)).y(s => y(s[d.key]))(seasonData)))
-            );
-        series.forEach(s => {
-            
-    linesG.selectAll(`.dot-${s.key}`)
-        .data(seasonData, d => d.season)
-        .join(
-            enter => enter.append('circle')
-                .attr('class', `dot-${s.key}`)
-                .attr('cx', d => x(d.season))
-                .attr('cy', y(0))
-                .attr('r', 5)
-                .attr('fill', s.color)
-                .attr('stroke', '#1a1a2e')
-                .attr('stroke-width', 2)
-                .call(enter => enter.transition(t)
-                    .attr('cy', d => y(d[s.key]))),
-            update => update.call(update => update.transition(t)
-                .attr('cx', d => x(d.season))
-                .attr('cy', d => y(d[s.key])))
-        )
-        .on('mouseover', (event, d) => {
-            tooltip
-                .style('opacity', 1)
-                .html(`
-                    <strong>${s.label}</strong><br/>
-                    Season: ${d.season}<br/>
-                    Avg: ${d[s.key].toFixed(1)}
-                `);
-        })
-        .on('mousemove', (event) => {
-            tooltip
-                .style('left', (event.pageX + 12) + 'px')
-                .style('top', (event.pageY - 28) + 'px');
-        })
-        .on('mouseout', () => {
-            tooltip.style('opacity', 0);
-        });
+       const normalized = seasonData.map(d => {
+    const total = d.x2pa + d.x3pa + d.fta;
+    return {
+        season: d.season,
+        x2pa: (d.x2pa / total) * 100,
+        x3pa: (d.x3pa / total) * 100,
+        fta:  (d.fta  / total) * 100
+    };
 });
-        // Draw Legend ONCE
-        if (g.selectAll('.macro-legend').empty()) {
-            const legend = g.append('g').attr('class', 'macro-legend').attr('transform', `translate(${innerWidth -160}, 20)`);
-            series.forEach((s, i) => {
-                const row = legend.append('g').attr('transform', `translate(0, ${i * 30})`);
-                row.append('line').attr('x1', 0).attr('x2', 20).attr('stroke', s.color).attr('stroke-width', 3);
-                row.append('text').attr('x', 30).attr('y', 5).text(s.label).attr('fill', '#f3f4f6').style('font-size', '14px');
-            });
-        }
+
+// Update scales — x is now a band scale, y is always 0–100
+const x = d3.scaleBand()
+    .domain(normalized.map(d => d.season))
+    .range([0, innerWidth])
+    .padding(0.15);
+
+y.domain([0, 100]);
+
+xAxisG.transition(t).call(d3.axisBottom(x).tickFormat(d3.format('d')));
+yAxisG.transition(t).call(d3.axisLeft(y).ticks(5).tickFormat(d => d + '%'));
+gridG.transition(t).call(d3.axisLeft(y).ticks(5).tickSize(-innerWidth).tickFormat(''));
+
+const series = [
+    { key: 'x3pa', label: '3-Point Attempts', color: '#FF4500' },
+    { key: 'x2pa', label: '2-Point Attempts', color: '#4f9cb8' },
+    { key: 'fta',  label: 'Free Throw Attempts', color: '#7ecf9a' }
+];
+
+// Stack the data
+const stack = d3.stack().keys(['x3pa', 'x2pa', 'fta']);
+const stacked = stack(normalized);
+
+// Draw stacked bar segments
+linesG.selectAll('.bar-group')
+    .data(stacked, d => d.key)
+    .join(
+        enter => enter.append('g')
+            .attr('class', 'bar-group')
+            .attr('fill', d => series.find(s => s.key === d.key).color),
+        update => update,
+        exit => exit.remove()
+    )
+    .each(function(segmentData) {
+        const key = segmentData.key;
+        const label = series.find(s => s.key === key)?.label ?? key;
+
+        d3.select(this).selectAll('rect')
+            .data(segmentData, d => d.data.season)
+            .join(
+                enter => enter.append('rect')
+                    .attr('x', d => x(d.data.season))
+                    .attr('width', x.bandwidth())
+                    .attr('y', innerHeight)
+                    .attr('height', 0)
+                    .on('mouseover', (event, d) => {
+                        tooltip
+                            .style('opacity', 1)
+                            .html(`<strong>${label}</strong><br/>Season: ${d.data.season}<br/>Share: ${(d[1] - d[0]).toFixed(1)}%`);
+                    })
+                    .on('mousemove', event => {
+                        tooltip
+                            .style('left', `${event.pageX + 12}px`)
+                            .style('top', `${event.pageY - 28}px`);
+                    })
+                    .on('mouseout', () => tooltip.style('opacity', 0))
+                    .call(enter => enter.transition(t)
+                        .attr('y', d => y(d[1]))
+                        .attr('height', d => y(d[0]) - y(d[1]))
+                    ),
+                update => update.call(update => update.transition(t)
+                    .attr('x', d => x(d.data.season))
+                    .attr('width', x.bandwidth())
+                    .attr('y', d => y(d[1]))
+                    .attr('height', d => y(d[0]) - y(d[1]))
+                ),
+                exit => exit.transition(t).attr('height', 0).attr('y', innerHeight).remove()
+            );
+    });
+    
     }
 
     // Initialize chart with 'all'
