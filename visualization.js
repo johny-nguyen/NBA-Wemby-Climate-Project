@@ -176,6 +176,24 @@ function renderChart(data){
         .attr('stroke', ([team]) => color(team))
         .attr('fill', 'none')
         .attr('stroke-width', 2);
+    // A dictionary to map metric values to nice readable titles
+    const metricTitles = {
+        'pace': 'The Pace of the Game',
+        'fga_per_game': 'Field Goal Attempts (FGA/G)',
+        'x3pa_per_game': 'The 3-Point Surge (3PA/G)',
+        'wins': 'Translating to Wins'
+    };
+
+    // metric radio listeners
+    d3.selectAll('input[name="metric"]').on('change', function() {
+        selectedMetric = this.value;
+        
+        // Dynamically update the header title!
+        d3.select('#chart-title').text(metricTitles[selectedMetric]);
+        
+        d3.select('#chart svg').remove();  
+        renderChart(data);
+    });
 
     // Compute league average per season
     const leagueAvg = Array.from(

@@ -115,8 +115,16 @@
 
         <figure class="sticky-dashboard">
             <div class="dashboard-wrapper glass-card">
-                <div id="controls" class="glass-controls">
-                    <div id="metric-toggle">
+                
+                <!-- NEW FORMATTED TITLE BAR -->
+                <div id="controls" class="glass-controls" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;">
+                    <h3 id="chart-title" style="margin: 0; font-size: 1.5rem; color: var(--accent); font-weight: 600;">The Pace of the Game</h3>
+                    
+                    <!-- Team logos moved here to sit across from the title -->
+                    <div id="team-logos" aria-label="Selected team logos"></div>
+
+                    <!-- Hidden toggles so scrolly.js still works perfectly! -->
+                    <div id="metric-toggle" style="display: none;">
                         <label><input type="radio" name="metric" value="pace" checked> Pace</label>
                         <label><input type="radio" name="metric" value="fga_per_game"> FGA/G</label>
                         <label><input type="radio" name="metric" value="x3pa_per_game"> 3PA/G</label>
@@ -125,9 +133,7 @@
                 </div>
 
                 <section id="dashboard-wrap" style="display: flex; flex-direction: column;">
-                    <div id="team-logos" aria-label="Selected team logos"></div>
                     <div id="dashboard">
-                        <!-- THE CHART IS NOW THE ONLY THING HERE -->
                         <div id="chart" style="flex: 1; height: 100%;"></div>
                     </div>
                 </section>
