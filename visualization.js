@@ -434,13 +434,6 @@ function renderMap(mapData){
             .domain([-125, -66])
             .interpolator(d3.interpolateRgbBasis(['#2f5d8a', '#4f9cb8', '#7ecf9a', '#f4c061', '#d9784d']));
 
-        svg.append('rect')
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('width', width)
-            .attr('height', height)
-            .attr('fill', '#d6e9f7');
-
         mapGroup.append('g')
             .selectAll('path')
             .data(states)
