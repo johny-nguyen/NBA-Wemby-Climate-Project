@@ -396,3 +396,10 @@ svg text { fill: var(--muted) !important; }
   height: 100%; 
   width: 100%;
 }
+/* Active state for filter buttons */
+.glass-button.active-toggle {
+    background: rgba(255, 69, 0, 0.4); /* Stronger orange for active state */
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+}

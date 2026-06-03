@@ -46,6 +46,22 @@
             </p>
         </div>
     </section>
+    <section id="evolution-section" style="max-width: 1400px; margin: 5vh auto 10vh auto; padding: 0 40px; position: relative; z-index: 10;">
+        <div class="glass-card">
+            <div class="badge">03.5 // MACRO TRENDS</div>
+            <h2>The Evolution of the League</h2>
+            <p style="margin-bottom: 24px;">Before we look at individual teams, let's observe how the entire NBA's shot profile has changed. Notice the dramatic convergence of 2-point and 3-point attempts, and the steady decline in free throws (fouls) over time.</p>
+
+            <!-- Filter Buttons -->
+            <div id="evolution-controls" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; margin-bottom: 32px;">
+                <button id="btn-all" class="glass-button active-toggle" style="padding: 12px 28px; font-size: 1rem;">All Teams</button>
+                <button id="btn-playoffs" class="glass-button" style="padding: 12px 28px; font-size: 1rem;">Playoff Teams</button>
+                <button id="btn-non-playoffs" class="glass-button" style="padding: 12px 28px; font-size: 1rem;">Non-Playoff Teams</button>
+            </div>
+
+            <div id="evolution-chart" style="width: 100%; height: 500px; background: rgba(0,0,0,0.2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden;"></div>
+        </div>
+    </section>
 
     <!-- NEW SEPARATE MAP SECTION -->
     <section id="map-section">

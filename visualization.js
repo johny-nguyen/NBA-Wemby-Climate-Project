@@ -13,8 +13,11 @@ async function loadData(){
         team: row.team,
         fga_per_game: Number(row.fga_per_game),
         x3pa_per_game: Number(row.x3pa_per_game),
+        x2pa_per_game: Number(row.x2pa_per_game), // ADD THIS
+        fta_per_game: Number(row.fta_per_game),
         season: Number(row.season)
-    }))
+    })),
+    
     ]);
 
     const lookup = new Map(data2.map(r => [`${r.team}-${r.season}`, r]));
@@ -533,3 +536,125 @@ initChart();
 renderMap(data);
 updateChart(data);
 updateTeamLogos();
+
+// This is the vis2 logic 
+// ==========================================
+// LEAGUE EVOLUTION CHART (Macro View)
+// ==========================================
+function initEvolutionChart(fullData) {
+    const width = 1200, height = 500;
+    const margin = { top: 30, right: 150, bottom: 50, left: 60 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+
+    const svg = d3.select('#evolution-chart')
+        .append('svg')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('width', '100%')
+        .attr('height', '100%');
+
+    const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+    const x = d3.scaleLinear().range([0, innerWidth]);
+    const y = d3.scaleLinear().range([innerHeight, 0]);
+
+    // Persistent axes groups
+    const xAxisG = g.append('g').attr('transform', `translate(0, ${innerHeight})`).attr('class', 'x-axis');
+    const yAxisG = g.append('g').attr('class', 'y-axis');
+    const gridG = g.append('g').attr('class', 'grid');
+    const linesG = g.append('g');
+
+    // Axes Labels
+    svg.append('text')
+        .attr('x', width / 2).attr('y', height - 10)
+        .attr('text-anchor', 'middle').attr('fill', '#9ca3af')
+        .text('Season');
+
+    svg.append('text')
+        .attr('x', -(height / 2)).attr('y', 20)
+        .attr('text-anchor', 'middle').attr('transform', 'rotate(-90)')
+        .attr('fill', '#9ca3af')
+        .text('Attempts Per Game');
+
+    function draw(filterType) {
+        const t = d3.transition().duration(750);
+
+        // Filter Data
+        let filtered = fullData;
+        if (filterType === 'playoffs') filtered = fullData.filter(d => d.playoffs);
+        if (filterType === 'non-playoffs') filtered = fullData.filter(d => !d.playoffs);
+
+        // Group by season and average the metrics
+        const seasonData = Array.from(
+            d3.group(filtered, d => d.season),
+            ([season, rows]) => ({
+                season,
+                x2pa: d3.mean(rows, d => d.x2pa_per_game),
+                x3pa: d3.mean(rows, d => d.x3pa_per_game),
+                fta: d3.mean(rows, d => d.fta_per_game)
+            })
+        ).sort((a, b) => a.season - b.season);
+
+        x.domain(d3.extent(seasonData, d => d.season));
+        y.domain([0, d3.max(seasonData, d => Math.max(d.x2pa, d.x3pa, d.fta)) + 5]);
+
+        xAxisG.transition(t).call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(10));
+        yAxisG.transition(t).call(d3.axisLeft(y));
+        gridG.transition(t).call(d3.axisLeft(y).tickSize(-innerWidth).tickFormat(''));
+
+        const series = [
+            { key: 'x2pa', label: '2-Point Attempts', color: '#4f9cb8' }, // Blue
+            { key: 'x3pa', label: '3-Point Attempts', color: '#FF4500' }, // Orange
+            { key: 'fta', label: 'Free Throw Attempts', color: '#7ecf9a' } // Green
+        ];
+
+        // Draw Lines
+        linesG.selectAll('.macro-line')
+            .data(series, d => d.key)
+            .join(
+                enter => enter.append('path')
+                    .attr('class', 'macro-line')
+                    .attr('fill', 'none')
+                    .attr('stroke', d => d.color)
+                    .attr('stroke-width', 3)
+                    .attr('d', d => d3.line().x(s => x(s.season)).y(y(0))(seasonData))
+                    .call(enter => enter.transition(t)
+                        .attr('d', d => d3.line().x(s => x(s.season)).y(s => y(s[d.key]))(seasonData))),
+                update => update.call(update => update.transition(t)
+                    .attr('d', d => d3.line().x(s => x(s.season)).y(s => y(s[d.key]))(seasonData)))
+            );
+
+        // Draw Legend ONCE
+        if (g.selectAll('.macro-legend').empty()) {
+            const legend = g.append('g').attr('class', 'macro-legend').attr('transform', `translate(${innerWidth + 20}, 20)`);
+            series.forEach((s, i) => {
+                const row = legend.append('g').attr('transform', `translate(0, ${i * 30})`);
+                row.append('line').attr('x1', 0).attr('x2', 20).attr('stroke', s.color).attr('stroke-width', 3);
+                row.append('text').attr('x', 30).attr('y', 5).text(s.label).attr('fill', '#f3f4f6').style('font-size', '14px');
+            });
+        }
+    }
+
+    // Initialize chart with 'all'
+    draw('all');
+
+    // Button Listeners
+    d3.select('#btn-all').on('click', function() {
+        d3.selectAll('#evolution-controls .glass-button').classed('active-toggle', false);
+        d3.select(this).classed('active-toggle', true);
+        draw('all');
+    });
+    d3.select('#btn-playoffs').on('click', function() {
+        d3.selectAll('#evolution-controls .glass-button').classed('active-toggle', false);
+        d3.select(this).classed('active-toggle', true);
+        draw('playoffs');
+    });
+    d3.select('#btn-non-playoffs').on('click', function() {
+        d3.selectAll('#evolution-controls .glass-button').classed('active-toggle', false);
+        d3.select(this).classed('active-toggle', true);
+        draw('non-playoffs');
+    });
+}
+
+// Call it!
+initEvolutionChart(data);
