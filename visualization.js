@@ -28,9 +28,8 @@ async function loadData(){
 }
 
 let data = await loadData();
-console.log([...new Set(data.map(d => d.team))].sort());
 
-// populate team dropdown dynamically (if you still have a hidden one)
+// populate team dropdown dynamically
 const teams = [...new Set(data.map(d => d.team))].sort();
 const select = d3.select('#team-select');
 teams.forEach(t => select.append('option').text(t).attr('value', t));
@@ -78,7 +77,7 @@ function teamAbbrev(teamName) {
 
 function updateTeamLogos() {
     const logoStrip = d3.select('#team-logos');
-    const logoData = selectedTeams.slice(0, 8);
+    const logoData = selectedTeams.slice(0, 6); 
 
     const chips = logoStrip.selectAll('.logo-chip')
         .data(logoData, d => d)
@@ -89,12 +88,18 @@ function updateTeamLogos() {
     chips.each(function(teamName) {
         const chip = d3.select(this);
         chip.selectAll('*').remove();
+        
         const logoSrc = teamLogos[teamName];
+        
         if (logoSrc) {
             chip.append('img').attr('src', logoSrc).attr('alt', `${teamName} logo`);
         } else {
-            chip.append('span').attr('class', 'fallback-text').text(teamAbbrev(teamName));
+            chip.append('div').attr('class', 'fallback-logo').text(teamAbbrev(teamName));
         }
+
+        chip.append('span')
+            .attr('class', 'team-name-label')
+            .text(teamName);
     });
 }
 
@@ -103,242 +108,256 @@ select.selectAll('option')
 
 const color = d3.scaleOrdinal(d3.schemeTableau10).domain(teams);
 
-function renderChart(data){
-    const width = 1200;
-    const height = 600;
-    const svg = d3
-    .select('#chart')
-    .append('svg')
-    .attr('viewBox', `0 0 ${width} ${height}`)
-    .attr('width', '100%')
-    .style('overflow', 'visible')
-    .attr('height', '100%');
-    const margin = { top: 20, right: 30, bottom: 50, left: 60 };
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
+// --- NEW REFACTORED CHART ARCHITECTURE ---
+let chartSvg, chartG, x, y, innerWidth, innerHeight;
+const width = 1200;
+const height = 600;
+const margin = { top: 20, right: 30, bottom: 50, left: 60 };
 
-    const g = svg.append('g')
-    .attr('transform', `translate(${margin.left}, ${margin.top})`);
+let tooltip;
 
-    const filtered = data.filter(d => selectedTeams.includes(d.team));
-    const grouped = d3.group(filtered, d => d.team);
+// 1. Build the empty structure ONCE
+function initChart() {
+    innerWidth = width - margin.left - margin.right;
+    innerHeight = height - margin.top - margin.bottom;
+
+    chartSvg = d3.select('#chart').append('svg')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .style('overflow', 'visible');
+
+    chartG = chartSvg.append('g')
+        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+    // Create persistent groups for layering
+    chartG.append('g').attr('class', 'y-grid-group');
+    chartG.append('g').attr('class', 'x-grid-group').attr('transform', `translate(0, ${innerHeight})`);
+    chartG.append('g').attr('class', 'x-axis-group').attr('transform', `translate(0, ${innerHeight})`);
+    chartG.append('g').attr('class', 'y-axis-group');
     
-    const x = d3.scaleLinear()
-        .domain(d3.extent(data, d => d.season))
-        .range([0, innerWidth]);
+    chartG.append('g').attr('class', 'lines-group');
+    chartG.append('g').attr('class', 'points-group');
+    chartG.append('g').attr('class', 'legend-group').attr('transform', `translate(${innerWidth - 120}, 10)`);
 
-    const y = d3.scaleLinear()
-        .domain(d3.extent(data, d => d[selectedMetric]))
-        .range([innerHeight, 0]);
+    x = d3.scaleLinear().range([0, innerWidth]);
+    y = d3.scaleLinear().range([innerHeight, 0]);
+
+    tooltip = d3.select('body')
+        .selectAll('.tooltip')
+        .data([null])
+        .join('div')
+        .attr('class', 'tooltip')
+        .style('position', 'absolute')
+        .style('background', '#1a1a2e')
+        .style('color', '#fff')
+        .style('padding', '8px 12px')
+        .style('border-radius', '6px')
+        .style('font-size', '13px')
+        .style('pointer-events', 'none')
+        .style('opacity', 0)
+        .style('z-index', 1000);
+}
+
+// 2. Update the data with smooth TRANSITIONS
+function updateChart(chartData) {
+    const t = d3.transition().duration(750).ease(d3.easeCubicOut); // Smooth morphing!
+
+    const filtered = chartData.filter(d => selectedTeams.includes(d.team));
+    const grouped = d3.group(filtered, d => d.team);
+
+    // Update Scales
+    x.domain(d3.extent(chartData, d => d.season));
+    y.domain(d3.extent(chartData, d => d[selectedMetric]));
 
     const line = d3.line()
         .x(d => x(d.season))
         .y(d => y(d[selectedMetric]));
 
-    // y gridlines
-    g.append('g')
-        .attr('class', 'grid')
-        .call(
+    // Animate Grids and Axes
+    chartG.select('.y-grid-group').transition(t).call(
+        d3.axisLeft(y).ticks(5).tickSize(-innerWidth).tickFormat('')
+    );
+    chartG.select('.x-grid-group').transition(t).call(
+        d3.axisBottom(x).ticks(8).tickSize(-innerHeight).tickFormat('')
+    );
+    chartG.select('.x-axis-group').transition(t).call(
+        d3.axisBottom(x).tickFormat(d3.format('d')).ticks(8)
+    );
+    chartG.select('.y-axis-group').transition(t).call(
         d3.axisLeft(y)
-            .ticks(5)
-            .tickSize(-innerWidth)
-            .tickFormat('')
-        );
+    );
 
-    // x gridlines
-    g.append('g')
-        .attr('class', 'grid')
-        .attr('transform', `translate(0, ${innerHeight})`)
-        .call(
-        d3.axisBottom(x)
-            .ticks(8)
-            .tickSize(-innerHeight)
-            .tickFormat('')
-        );
-
-    // x axis
-    g.append('g')
-        .attr('class', 'x-axis')
-        .attr('transform', `translate(0, ${innerHeight})`)
-        .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(8));
-
-    // y axis
-    g.append('g')
-        .attr('class', 'y-axis')
-        .call(d3.axisLeft(y));
-
-    // bind one path per team
-    g.selectAll('.team-line')
+    // Animate Team Lines
+    chartG.select('.lines-group').selectAll('.team-line')
         .data(grouped, ([team]) => team)
-        .join('path')
-        .attr('class', 'team-line')
-        .attr('d', ([, values]) => line(values.sort((a, b) => a.season - b.season)))
-        .attr('stroke', ([team]) => color(team))
-        .attr('fill', 'none')
-        .attr('stroke-width', 2);
-    // A dictionary to map metric values to nice readable titles
-    const metricTitles = {
-        'pace': 'The Pace of the Game',
-        'fga_per_game': 'Field Goal Attempts (FGA/G)',
-        'x3pa_per_game': 'The 3-Point Surge (3PA/G)',
-        'wins': 'Translating to Wins'
-    };
+        .join(
+            enter => enter.append('path')
+                .attr('class', 'team-line')
+                .attr('stroke', ([team]) => color(team))
+                .attr('fill', 'none')
+                .attr('stroke-width', 2)
+                .attr('opacity', 0)
+                .attr('d', ([, values]) => line(values.sort((a, b) => a.season - b.season)))
+                .call(enter => enter.transition(t).attr('opacity', 1)),
+            update => update.call(update => update.transition(t)
+                .attr('d', ([, values]) => line(values.sort((a, b) => a.season - b.season)))
+            ),
+            exit => exit.call(exit => exit.transition(t).attr('opacity', 0).remove())
+        );
 
-    // metric radio listeners
-    d3.selectAll('input[name="metric"]').on('change', function() {
-        selectedMetric = this.value;
-        
-        // Dynamically update the header title!
-        d3.select('#chart-title').text(metricTitles[selectedMetric]);
-        
-        d3.select('#chart svg').remove();  
-        renderChart(data);
-    });
-
-    // Compute league average per season
+    // Calculate League Average
     const leagueAvg = Array.from(
-    d3.group(data, d => d.season),
-    ([season, rows]) => ({
-        season,
-        [selectedMetric]: d3.mean(rows, d => d[selectedMetric])
-    })
+        d3.group(chartData, d => d.season),
+        ([season, rows]) => ({
+            season,
+            [selectedMetric]: d3.mean(rows, d => d[selectedMetric])
+        })
     ).sort((a, b) => a.season - b.season);
 
-    // Dashed average line
-    g.append('path')
-    .datum(leagueAvg)
-    .attr('class', 'avg-line')
-    .attr('d', d3.line()
-        .x(d => x(d.season))
-        .y(d => y(d[selectedMetric]))
-    )
-    .attr('stroke', '#aaa')
-    .attr('stroke-width', 1.5)
-    .attr('stroke-dasharray', '6 3')
-    .attr('fill', 'none');
+    // Animate Average Line
+    chartG.select('.lines-group').selectAll('.avg-line')
+        .data([leagueAvg])
+        .join(
+            enter => enter.append('path')
+                .attr('class', 'avg-line')
+                .attr('stroke', '#aaa')
+                .attr('stroke-width', 1.5)
+                .attr('stroke-dasharray', '6 3')
+                .attr('fill', 'none')
+                .attr('opacity', 0)
+                .attr('d', line)
+                .call(enter => enter.transition(t).attr('opacity', 1)),
+            update => update.call(update => update.transition(t).attr('d', line))
+        );
 
-    // Points on the average line
-    g.selectAll('.avg-point')
-    .data(leagueAvg)
-    .join('circle')
-    .attr('class', 'avg-point')
-    .attr('cx', d => x(d.season))
-    .attr('cy', d => y(d[selectedMetric]))
-    .attr('r', 3)
-    .attr('fill', '#aaa')
-    .on('mouseover', (event, d) => {
-        const svgRect = svg.node().getBoundingClientRect();
-        const scaleX = svgRect.width  / width;
+    // Tooltip Mouseover Function
+    const handleMouseover = function(event, d) {
+        const px = x(d.season);
+        const py = y(d[selectedMetric]);
+        const svgRect = chartSvg.node().getBoundingClientRect();
+        const scaleX = svgRect.width  / width;   
         const scaleY = svgRect.height / height;
+        
         tooltip
-        .style('opacity', 1)
-        .style('left', `${svgRect.left + (margin.left + x(d.season)) * scaleX + 12}px`)
-        .style('top',  `${svgRect.top  + (margin.top  + y(d[selectedMetric])) * scaleY - 28}px`)
-        .html(`
-            <strong>League Avg</strong><br/>
+            .style('opacity', 1)
+            .style('left', `${svgRect.left + (margin.left + px) * scaleX + 12}px`)
+            .style('top',  `${svgRect.top  + (margin.top  + py) * scaleY - 28}px`)
+            .html(`
+            <strong>${d.team || 'League Avg'}</strong><br/>
             Season: ${d.season}<br/>
-            ${selectedMetric}: ${d[selectedMetric]?.toFixed(1)}
-        `);
-    })
-    .on('mouseout', () => tooltip.style('opacity', 0));
+            ${selectedMetric}: ${d[selectedMetric]?.toFixed(1)}<br/>
+            `);
+    };
 
-    // tooltip
-    const tooltip = d3.select('body')
-    .selectAll('.tooltip')
-    .data([null])
-    .join('div')
-    .attr('class', 'tooltip')
-    .style('position', 'absolute')
-    .style('background', '#1a1a2e')
-    .style('color', '#fff')
-    .style('padding', '8px 12px')
-    .style('border-radius', '6px')
-    .style('font-size', '13px')
-    .style('pointer-events', 'none')
-    .style('opacity', 0);
+    // Animate Average Points
+    chartG.select('.points-group').selectAll('.avg-point')
+        .data(leagueAvg, d => d.season)
+        .join(
+            enter => enter.append('circle')
+                .attr('class', 'avg-point')
+                .attr('cx', d => x(d.season))
+                .attr('cy', d => y(d[selectedMetric]))
+                .attr('r', 3)
+                .attr('fill', '#aaa')
+                .attr('opacity', 0)
+                .on('mouseover', handleMouseover)
+                .on('mouseout', () => tooltip.style('opacity', 0))
+                .call(enter => enter.transition(t).attr('opacity', 1)),
+            update => update.call(update => update.transition(t)
+                .attr('cx', d => x(d.season))
+                .attr('cy', d => y(d[selectedMetric]))
+            )
+        );
 
-    g.selectAll('.team-points')
-    .data([...grouped])                          
-    .join('g')
-    .attr('class', 'team-points')
-    .each(function([team, values]) {
-    d3.select(this)
-    .selectAll('circle')
-    .data(values)
-    .join('circle')
-    .attr('cx', d => x(d.season))
-    .attr('cy', d => y(d[selectedMetric]))
-    .attr('r', 7)
-    .attr('fill', color(team))
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 1)
-    .on('mouseover', (event, d) => {
-    const [px, py] = [x(d.season), y(d[selectedMetric])];
-    const svgNode = svg.node();
-    const svgRect = svgNode.getBoundingClientRect();
+    // Animate Team Points
+    chartG.select('.points-group').selectAll('.team-point-group')
+        .data(grouped, ([team]) => team)
+        .join(
+            enter => enter.append('g').attr('class', 'team-point-group'),
+            update => update,
+            exit => exit.remove()
+        )
+        .selectAll('.team-point')
+        .data(([, values]) => values, d => d.season)
+        .join(
+            enter => enter.append('circle')
+                .attr('class', 'team-point')
+                .attr('cx', d => x(d.season))
+                .attr('cy', d => y(d[selectedMetric]))
+                .attr('r', 7)
+                .attr('fill', d => color(d.team))
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 1)
+                .attr('opacity', 0)
+                .on('mouseover', handleMouseover)
+                .on('mouseout', () => tooltip.style('opacity', 0))
+                .call(enter => enter.transition(t).attr('opacity', 1)),
+            update => update.call(update => update.transition(t)
+                .attr('cx', d => x(d.season))
+                .attr('cy', d => y(d[selectedMetric]))
+            ),
+            exit => exit.remove()
+        );
 
-    const scaleX = svgRect.width  / width;   
-    const scaleY = svgRect.height / height;
-    
-    tooltip
-        .style('opacity', 1)
-        .style('left', `${svgRect.left + (margin.left + px) * scaleX + 12}px`)
-        .style('top',  `${svgRect.top  + (margin.top  + py) * scaleY - 28}px`)
-        .html(`
-        <strong>${d.team}</strong><br/>
-        Season: ${d.season}<br/>
-        ${selectedMetric}: ${d[selectedMetric]?.toFixed(1)}<br/>
-        `);
-    })
-    });
-    
-    const legendData = [...selectedTeams.map(t => ({ label: t, color: color(t), dashed: false })),
+    // Animate Legend
+    const legendData = [...selectedTeams.map(team => ({ label: team, color: color(team), dashed: false })),
                         { label: 'League Avg', color: '#aaa', dashed: true }];
 
-    const legend = g.append('g')
-    .attr('class', 'legend')
-    .attr('transform', `translate(${innerWidth - 120}, 10)`);
+    chartG.select('.legend-group').selectAll('.legend-row')
+        .data(legendData, d => d.label)
+        .join(
+            enter => {
+                const g = enter.append('g')
+                    .attr('class', 'legend-row')
+                    .attr('transform', (d, i) => `translate(0, ${i * 24})`)
+                    .attr('opacity', 0);
+                    
+                g.append('line')
+                    .attr('x1', 0).attr('x2', 20)
+                    .attr('y1', 7).attr('y2', 7)
+                    .attr('stroke', d => d.color)
+                    .attr('stroke-width', 2)
+                    .attr('stroke-dasharray', d => d.dashed ? '6 3' : null);
 
-    const legendRows = legend.selectAll('.legend-row')
-    .data(legendData)
-    .join('g')
-    .attr('class', 'legend-row')
-    .attr('transform', (d, i) => `translate(0, ${i * 24})`);
+                g.append('circle')
+                    .attr('cx', 10).attr('cy', 7)
+                    .attr('r', 4)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', d => d.dashed ? 'none' : '#fff')
+                    .attr('stroke-width', 1);
 
-    legendRows.append('line')
-    .attr('x1', 0).attr('x2', 20)
-    .attr('y1', 7).attr('y2', 7)
-    .attr('stroke', d => d.color)
-    .attr('stroke-width', 2)
-    .attr('stroke-dasharray', d => d.dashed ? '6 3' : null);
-
-    legendRows.append('circle')
-    .attr('cx', 10).attr('cy', 7)
-    .attr('r', 4)
-    .attr('fill', d => d.color)
-    .attr('stroke', d => d.dashed ? 'none' : '#fff')
-    .attr('stroke-width', 1);
-
-    legendRows.append('text')
-    .attr('x', 28).attr('y', 11)
-    .text(d => d.label)
-    .attr('fill', '#333')
-    .style('font-size', '13px');
+                g.append('text')
+                    .attr('x', 28).attr('y', 11)
+                    .text(d => d.label)
+                    .attr('fill', '#f3f4f6') 
+                    .style('font-size', '13px');
+                    
+                g.transition(t).attr('opacity', 1);
+                return g;
+            },
+            update => update.call(update => update.transition(t)
+                .attr('transform', (d, i) => `translate(0, ${i * 24})`)
+            ),
+            exit => exit.call(exit => exit.transition(t).attr('opacity', 0).remove())
+        );
 }
 
-// team select listener
-d3.select('#team-select').on('change', function() {
-    selectedTeams = Array.from(this.selectedOptions).map(o => o.value);
-    updateTeamLogos();
-    d3.select('#chart svg').remove();  
-    renderChart(data);
-});
+// Map Metric Titles
+const metricTitles = {
+    'pace': 'The Pace of the Game',
+    'fga_per_game': 'Field Goal Attempts (FGA/G)',
+    'x3pa_per_game': 'The 3-Point Surge (3PA/G)',
+    'wins': 'Translating to Wins'
+};
 
 // metric radio listeners
 d3.selectAll('input[name="metric"]').on('change', function() {
     selectedMetric = this.value;
-    d3.select('#chart svg').remove();  
-    renderChart(data);
+    d3.select('#chart-title').text(metricTitles[selectedMetric]);
+    
+    // Smoothly update instead of removing the SVG!
+    updateChart(data);
 });
 
 // Map
@@ -350,9 +369,10 @@ function renderMap(mapData){
     .attr('width', '100%')
     .attr('height', '100%');
 
-    // 1. ADD ZOOM BEHAVIOR
+    const mapGroup = svg.append('g').attr('class', 'map-layer');
+
     const zoom = d3.zoom()
-        .scaleExtent([1, 8]) // Zoom limits
+        .scaleExtent([1, 8])
         .on('zoom', (event) => {
             mapGroup.attr('transform', event.transform);
         });
@@ -414,7 +434,6 @@ function renderMap(mapData){
             .domain([-125, -66])
             .interpolator(d3.interpolateRgbBasis(['#2f5d8a', '#4f9cb8', '#7ecf9a', '#f4c061', '#d9784d']));
 
-        // This invisible/ocean rect catches the zoom events perfectly
         svg.append('rect')
             .attr('x', 0)
             .attr('y', 0)
@@ -422,10 +441,6 @@ function renderMap(mapData){
             .attr('height', height)
             .attr('fill', '#d6e9f7');
 
-        // 2. CREATE A GROUP FOR MAP LAYER (so it can be zoomed)
-        const mapGroup = svg.append('g').attr('class', 'map-layer');
-
-        // Append paths to mapGroup instead of svg
         mapGroup.append('g')
             .selectAll('path')
             .data(states)
@@ -450,9 +465,9 @@ function renderMap(mapData){
             .style('border-radius', '6px')
             .style('font-size', '13px')
             .style('pointer-events', 'none')
-            .style('opacity', 0);
+            .style('opacity', 0)
+            .style('z-index', 1000);
 
-        // Append circles to mapGroup instead of svg
         const circles = mapGroup.append('g')
             .selectAll('circle')
             .data(nbaTeams)
@@ -478,58 +493,50 @@ function renderMap(mapData){
                     .style('top',  `${event.pageY - 28}px`);
             })
             .on('mouseout', () => tooltip.style('opacity', 0))
-            
             .on('click', (event, d) => {
                 const idx = selectedTeams.indexOf(d.id);
                 if (idx === -1) {
-                    selectedTeams.push(d.id);       // add team
+                    selectedTeams.push(d.id);
                 } else {
-                    selectedTeams.splice(idx, 1);   // remove if already selected
+                    selectedTeams.splice(idx, 1);
                 }
 
                 select.selectAll('option')
                     .property('selected', function() { return selectedTeams.includes(this.value); });
                 updateTeamLogos();
 
-            // update circle opacity to reflect selection
                 circles.attr('opacity', t =>
                     selectedTeams.includes(t.id) ? 1 : 0.3
                 ).attr('r', t =>
                     selectedTeams.includes(t.id) ? 11 : 8
                 );
 
-                // redraw chart
-                d3.select('#chart svg').remove();
-                renderChart(mapData);
-        });
+                // Smoothly update when teams are selected
+                updateChart(mapData);
+            });
 
         circles.attr('opacity', d => selectedTeams.includes(d.id) ? 1 : 0.3)
                 .attr('r', d => selectedTeams.includes(d.id) ? 11 : 8);
 
-        // 3. RESET BUTTON LOGIC
         d3.select('#reset-map-btn').on('click', () => {
-            // Empty selection
             selectedTeams = []; 
             updateTeamLogos();
             select.selectAll('option').property('selected', false);
 
-            // Reset circles visually
             circles.transition().duration(300)
                 .attr('opacity', 0.3)
                 .attr('r', 8);
 
-            // Clear the chart (it will just be an empty chart since selectedTeams is empty)
-            d3.select('#chart svg').remove();
-            renderChart(mapData); 
+            // Smoothly update when reset
+            updateChart(mapData); 
 
-            // Smoothly animate the map back to default zoom/pan
-            svg.transition()
-               .duration(750) 
-               .call(zoom.transform, d3.zoomIdentity);
+            svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
         });
     });
 }
 
+// 3. Initialize everything on page load
+initChart(); 
 renderMap(data);
-renderChart(data);
+updateChart(data);
 updateTeamLogos();

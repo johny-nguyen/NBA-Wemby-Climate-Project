@@ -152,29 +152,58 @@ body {
   flex-wrap: wrap; 
   justify-content: flex-end; 
   align-items: center;
-  gap: 8px; 
+  gap: 12px; /* Gives the larger pills more breathing room */
   width: auto; 
-  max-width: 50%; 
+  max-width: 65%; /* Allows more room in the header for the names */
 }
 
+/* Transforms the tiny circle into a sleek glass pill */
 #team-logos .logo-chip { 
   position: relative !important; 
   flex-shrink: 0; 
-  width: 24px; 
-  height: 24px; 
-  border-radius: 999px; 
-  background: #fff; 
-  border: 1px solid var(--border); 
-  display: grid; 
-  place-items: center; 
-  box-shadow: 0 2px 8px rgba(26, 41, 65, 0.12); 
-  overflow: hidden; 
+  height: auto; 
+  padding: 6px 16px 6px 6px; /* Pill shape padding */
+  border-radius: 30px; 
+  background: rgba(255, 255, 255, 0.05); 
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15); 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; /* Space between the logo and the text */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+  transition: all 0.3s ease;
 }
 
+/* Larger, cleaner logo */
 #team-logos img { 
-  width: 100%; 
-  height: 100%; 
+  width: 32px; 
+  height: 32px; 
+  border-radius: 50%;
+  background: #fff; /* Keeps white backgrounds clean */
+  padding: 2px;
   object-fit: contain; 
+}
+
+/* New style for the team name text */
+.team-name-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap; /* Prevents long names from stacking weirdly */
+}
+
+/* Fallback for teams without a logo image */
+.fallback-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: bold;
 }
 
 @media (max-width: 1000px) {
