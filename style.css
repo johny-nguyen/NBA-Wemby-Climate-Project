@@ -34,11 +34,7 @@ body {
   justify-content: center;
   align-items: center;
   position: relative;
-  background: linear-gradient(to bottom, rgba(5, 5, 7, 0.4) 0%, rgba(5, 5, 7, 1) 100%), 
-              url('nba-finals-court-3.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; 
+  background: #050507;
   overflow: hidden;
 }
 
@@ -56,7 +52,7 @@ body {
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  background: transparent;
+  background: #050507;
 }
 
 .hero-video-bg iframe,
@@ -64,10 +60,10 @@ body {
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;
-  width: max(100vw, 177.78vh) !important;
-  height: max(100vh, 56.25vw) !important;
-  min-width: 100vw !important;
-  min-height: 56.25vw !important;
+  width: 100vw !important;
+  height: 56.25vw !important;
+  min-width: 177.78vh !important;
+  min-height: 100vh !important;
   transform: translate(-50%, -50%) !important;
   pointer-events: none;
 }
