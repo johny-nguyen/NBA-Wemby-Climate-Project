@@ -410,3 +410,8 @@ svg text { fill: var(--muted) !important; }
   bottom: unset;
   left: unset;
 }
+
+.glass-card .side-gif{
+  width: 100%;
+  height: auto;
+}
