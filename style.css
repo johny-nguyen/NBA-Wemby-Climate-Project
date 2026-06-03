@@ -15,7 +15,6 @@ body {
   color: var(--text);
   background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
-  /* Removed overflow: hidden to allow scrolling! */
 }
 
 .noise-overlay {
@@ -32,24 +31,23 @@ body {
   justify-content: center;
   align-items: center;
   position: relative;
-  /* Fades the image at the bottom so it blends into the next section */
   background: linear-gradient(to bottom, rgba(5, 5, 7, 0.4) 0%, rgba(5, 5, 7, 1) 100%), 
               url('nba-finals-court-3.jpg');
   background-size: cover;
   background-position: center;
-  background-attachment: fixed; /* Creates a slight parallax effect */
+  background-attachment: fixed; 
 }
 
 .hero-content h2 {
-  font-size: 2.5rem; /* Increased from the standard 2rem */
+  font-size: 2.5rem; 
   margin-bottom: 24px;
 }
 
 .hero-content p {
-  font-size: 1.5rem; /* Increased from the standard 1.15rem */
+  font-size: 1.5rem; 
   line-height: 1.6;
-  color: var(--text); /* Uses the brighter white instead of the muted grey */
-  max-width: 800px; /* Keeps the lines from getting too wide to read */
+  color: var(--text); 
+  max-width: 800px; 
 }
 
 /* --- CONTEXT SECTION (Question & Dataset) --- */
@@ -65,7 +63,6 @@ body {
 }
 
 #context-section .glass-card {
-  /* Overrides the default max-width so they fill the grid evenly */
   max-width: 100%; 
   margin: 0;
 }
@@ -75,10 +72,9 @@ body {
   font-weight: 600;
 }
 
-/* Mobile responsiveness for the new section */
 @media (max-width: 1000px) {
   #context-section {
-    grid-template-columns: 1fr; /* Stacks the cards on smaller screens */
+    grid-template-columns: 1fr; 
     padding: 0 20px;
   }
 }
@@ -109,35 +105,33 @@ body {
   position: relative;
 }
 
-/* Left Side: Text */
 .scroll-text {
   flex: 1;
-  padding: 10vh 0 50vh 0; /* Padding allows the user to scroll past the dashboard */
+  padding: 10vh 0 50vh 0; 
   max-width: 450px;
   z-index: 10;
 }
 
 .step {
-  min-height: 80vh; /* Spaces out the text blocks */
+  min-height: 80vh; 
   display: flex;
   flex-direction: column;
   justify-content: center;
-  opacity: 0.2; /* Faded out by default */
+  opacity: 0.2; 
   transform: translateY(20px);
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .step.is-active {
-  opacity: 1; /* Script makes it visible when scrolling past */
+  opacity: 1; 
   transform: translateY(0);
 }
 
-/* Right Side: Sticky Dashboard */
 .sticky-dashboard {
   flex: 2;
   position: sticky;
-  top: 5vh; /* Sticks 5% from the top of the screen */
-  height: 90vh; /* Takes up 90% of the screen height */
+  top: 5vh; 
+  height: 90vh; 
   margin: 0 0 0 40px;
   z-index: 5;
 }
@@ -147,6 +141,49 @@ body {
   display: flex;
   flex-direction: column;
   padding: 24px;
+}
+
+#team-logos { 
+  position: absolute; 
+  top: 16px; 
+  right: 16px; 
+  z-index: 10; 
+  display: flex !important; 
+  flex-direction: row !important; 
+  flex-wrap: wrap; 
+  justify-content: flex-end; 
+  gap: 8px; 
+  width: auto; 
+  max-width: 50%; 
+}
+
+#team-logos .logo-chip { 
+  position: relative !important; 
+  flex-shrink: 0; 
+  width: 24px; 
+  height: 24px; 
+  border-radius: 999px; 
+  background: #fff; 
+  border: 1px solid var(--border); 
+  display: grid; 
+  place-items: center; 
+  box-shadow: 0 2px 8px rgba(26, 41, 65, 0.12); 
+  overflow: hidden; 
+}
+
+#team-logos img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: contain; 
+}
+
+@media (max-width: 1000px) {
+  #dashboard { 
+    flex-direction: column; 
+  }
+  #map, #chart { 
+    min-height: 420px; 
+  }
 }
 
 /* --- GLASSMORPHISM COMPONENTS --- */
@@ -167,14 +204,102 @@ p { font-size: 1.15rem; line-height: 1.8; color: var(--muted); font-weight: 300;
 
 /* --- DASHBOARD SPECIFICS --- */
 .glass-controls { margin-bottom: 24px; display: flex; gap: 24px; background: rgba(0,0,0,0.4); padding: 16px 24px; border-radius: 16px; border: 1px solid var(--border); }
-#team-select { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-family: inherit; }
 #metric-toggle input[type="radio"] { accent-color: var(--accent); }
-#dashboard-wrap { position: relative; flex-grow: 1; min-height: 0; }
-#dashboard { display: flex; flex-direction: column; gap: 16px; height: 100%; }
-#map, #chart { background: rgba(0,0,0,0.2); border-radius: 16px; border: 1px solid var(--border); flex: 1; min-height: 0;}
+#dashboard-wrap { 
+  position: relative; 
+  flex-grow: 1; 
+  min-height: 600px; 
+}
+
+#dashboard { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: stretch; 
+  gap: 24px; 
+  height: 100%; 
+}
+
+#map { 
+  background: rgba(0,0,0,0.2); 
+  border-radius: 16px; 
+  border: 1px solid var(--border); 
+  flex: 1.5; 
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+#chart { 
+  background: rgba(0,0,0,0.2); 
+  border-radius: 16px; 
+  border: 1px solid var(--border); 
+  flex: 1; 
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* NEW GLASS BUTTON */
+.glass-button {
+  position: absolute;
+  bottom: 16px;
+  left: 16px; /* Placed over the map */
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.glass-button:hover {
+  background: rgba(255, 69, 0, 0.2); 
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 svg text { fill: var(--muted) !important; }
 .grid line { stroke: rgba(255,255,255,0.05); }
 .domain { stroke: rgba(255,255,255,0.1); }
+
+/* --- Tooltip Styles --- */
+.map-tooltip {
+  position: absolute;
+  pointer-events: none; 
+  background: rgba(10, 10, 12, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  color: var(--text);
+  z-index: 1000;
+  opacity: 0; 
+}
+
+.map-tooltip img {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+}
+
+.map-tooltip h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
 
 /* --- WRITEUP SECTION --- */
 #writeup-section {
@@ -185,10 +310,30 @@ svg text { fill: var(--muted) !important; }
 
 #writeup-section h3 { margin-top: 32px; font-size: 1.4rem; }
 
-/* Responsive adjustments */
 @media (max-width: 1000px) {
   #scrolly { flex-direction: column; padding: 0 20px; }
   .sticky-dashboard { position: relative; top: 0; height: 80vh; margin: 40px 0; }
   .scroll-text { max-width: 100%; padding: 5vh 0; }
   .step { min-height: auto; margin-bottom: 5vh; opacity: 1; transform: none; }
+}
+
+/* --- NEW MAP SECTION --- */
+#map-section {
+  max-width: 1400px;
+  margin: 5vh auto 10vh auto;
+  padding: 0 40px;
+  position: relative;
+  z-index: 10;
+}
+
+#map-section .glass-card {
+  max-width: 100%;
+}
+
+#dashboard { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: stretch; 
+  height: 100%; 
+  width: 100%;
 }
