@@ -23,11 +23,11 @@ const observer = new IntersectionObserver((entries) => {
             
             // Automatically switch the chart metric based on the section!
             if (currentStepId === "1") {
-                document.querySelector('input[value="pace"]').click();
-            } else if (currentStepId === "2") {
-                document.querySelector('input[value="fga_per_game"]').click();
-            } else if (currentStepId === "3") {
                 document.querySelector('input[value="x3pa_per_game"]').click();
+            } else if (currentStepId === "2") {
+                document.querySelector('input[value="pace"]').click();
+            } else if (currentStepId === "3") {
+                document.querySelector('input[value="fga_per_game"]').click();
             } else if (currentStepId === "4") {
                 document.querySelector('input[value="wins"]').click();
             }

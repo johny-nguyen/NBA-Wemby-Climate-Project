@@ -40,7 +40,7 @@ teams.forEach(t => select.append('option').text(t).attr('value', t));
 
 // selected state
 let selectedTeams = ['Los Angeles Lakers', 'Boston Celtics'];  // default selection
-let selectedMetric = 'pace';
+let selectedMetric = 'x3pa_per_game';
 
 const teamLogos = {
     'Atlanta Hawks': 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png',
