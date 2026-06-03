@@ -26,7 +26,7 @@ body {
   pointer-events: none; z-index: 999;
 }
 
-/* --- HERO SECTION WITH IMAGE --- */
+/* --- HERO SECTION WITH VIDEO --- */
 #hero {
   height: 100vh;
   display: flex;
@@ -39,6 +39,41 @@ body {
   background-size: cover;
   background-position: center;
   background-attachment: fixed; 
+  overflow: hidden;
+}
+
+#hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to bottom, rgba(5, 5, 7, 0.35) 0%, rgba(5, 5, 7, 1) 100%);
+  pointer-events: none;
+}
+
+.hero-video-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #050507;
+}
+
+.hero-video-bg iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 177.78vh;
+  height: 100vh;
+  min-width: 100vw;
+  min-height: 56.25vw;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
 }
 
 .hero-content h2 {
@@ -84,6 +119,7 @@ body {
 
 .scroll-indicator {
   position: absolute;
+  z-index: 2;
   bottom: 40px;
   text-align: center;
   font-size: 0.9rem;
