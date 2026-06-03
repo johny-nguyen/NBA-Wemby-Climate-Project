@@ -626,7 +626,7 @@ function initEvolutionChart(fullData) {
 
         // Draw Legend ONCE
         if (g.selectAll('.macro-legend').empty()) {
-            const legend = g.append('g').attr('class', 'macro-legend').attr('transform', `translate(${innerWidth + 20}, 20)`);
+            const legend = g.append('g').attr('class', 'macro-legend').attr('transform', `translate(${innerWidth -160}, 20)`);
             series.forEach((s, i) => {
                 const row = legend.append('g').attr('transform', `translate(0, ${i * 30})`);
                 row.append('line').attr('x1', 0).attr('x2', 20).attr('stroke', s.color).attr('stroke-width', 3);
