@@ -56,19 +56,24 @@ body {
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  background: #050507;
+  background: transparent;
 }
 
-.hero-video-bg iframe {
+.hero-video-bg iframe,
+#hero-player {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 177.78vh;
-  height: 100vh;
+  width: max(100vw, 177.78vh);
+  height: max(100vh, 56.25vw);
   min-width: 100vw;
   min-height: 56.25vw;
   transform: translate(-50%, -50%);
   pointer-events: none;
+}
+
+.hero-video-bg iframe {
+  border: 0;
 }
 
 .hero-content {
