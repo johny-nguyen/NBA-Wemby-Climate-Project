@@ -26,6 +26,7 @@
             <div class="arrow">↓</div>
         </div>
     </header>
+
     <section id="context-section">
         <div class="glass-card">
             <div class="badge">02 // THE QUESTION</div>
@@ -45,6 +46,7 @@
             </p>
         </div>
     </section>
+
     <!-- NEW SEPARATE MAP SECTION -->
     <section id="map-section">
         <div class="glass-card" style="position: relative; height: 80vh; display: flex; flex-direction: column;">
@@ -61,33 +63,54 @@
                 </svg>
                 Reset Map
             </button>
+            <div style="text-align: center; margin-top: 24px; padding-bottom: 10px;">
+                <a href="#scrolly" class="glass-button" style="display: inline-flex; position: relative; bottom: 0; left: 0; justify-content: center; width: 250px; margin: 0 auto; background: var(--accent); color: white; border: none;">
+                Analyze Selected Teams ↓
+            </a>
+            </div>
         </div>
     </section>
 
     <!-- SCROLLYTELLING SECTION (Now strictly for the Chart) -->
     <main id="scrolly">
         <article class="scroll-text">
+            
+            <!-- SECTION 1: PACE -->
             <div class="step" data-step="1">
                 <div class="glass-card">
-                    <div class="badge">05 // EXPLORE</div>
-                    <h2>Interactive Data</h2>
-                    <p>Compare your selected NBA teams across seasons. Use the toggles above the chart to isolate variables like pace, field goal attempts, and wins.</p>
+                    <div class="badge">05 // SPEED</div>
+                    <h2>The Pace of the Game</h2>
+                    <p>Pace measures the number of possessions a team has per 48 minutes. Over the last decade, the NBA has evolved into a track meet. Notice how the league average has steadily climbed, pushing teams to play faster than ever before.</p>
                 </div>
             </div>
+
+            <!-- SECTION 2: FGA -->
             <div class="step" data-step="2">
                 <div class="glass-card">
-                    <div class="badge">06 // INSIGHTS</div>
-                    <h2>Decreasing Fouls</h2>
-                    <p>As spacing increases and teams prioritize long-range shooting, the whistle is blowing less often. The game has gotten faster, but surprisingly, less physical.</p>
+                    <div class="badge">06 // OFFENSE</div>
+                    <h2>Field Goal Attempts (FGA)</h2>
+                    <p>With a faster pace comes more opportunities to score. Field Goal Attempts per game (FGA/G) have naturally risen alongside pace. Teams are shooting earlier in the shot clock, prioritizing volume and efficiency.</p>
                 </div>
             </div>
+
+            <!-- SECTION 3: 3PA -->
             <div class="step" data-step="3">
                 <div class="glass-card">
-                    <div class="badge">07 // INSIGHTS</div>
-                    <h2>The 3-Point Surge</h2>
-                    <p>Three-point attempts have fundamentally changed the pace of play. Notice the league-average trendline rocketing upward over the past decade.</p>
+                    <div class="badge">07 // STRATEGY</div>
+                    <h2>The 3-Point Surge (3PA)</h2>
+                    <p>This is the most dramatic shift in modern basketball history. The analytics revolution proved that 3 > 2. Watch the staggering upward trajectory of Three-Point Attempts per game across the entire league over the past decade.</p>
                 </div>
             </div>
+
+            <!-- SECTION 4: WINS -->
+            <div class="step" data-step="4">
+                <div class="glass-card">
+                    <div class="badge">08 // SUCCESS</div>
+                    <h2>Translating to Wins</h2>
+                    <p>Do these modern metrics guarantee a championship? By looking at the Wins column, we can see if the teams adopting these high-pace, high-volume strategies are actually separating themselves from the pack, or if traditional defense still reigns supreme.</p>
+                </div>
+            </div>
+
         </article>
 
         <figure class="sticky-dashboard">
@@ -114,7 +137,7 @@
 
     <section id="writeup-section">
         <div class="glass-card">
-            <div class="badge">07 // Writeup</div>
+            <div class="badge">09 // WRITEUP</div>
             <h2>Overview</h2>
             <p>
                 Our team’s final project aims to create an interactive data visualization experience 
@@ -142,11 +165,13 @@
                     while also having it clearly convey our question and message. Additionally, making a functional 
                     map that represents each team will be a challenge since some teams relocate or get phased out of 
                     the league over time. This means that we have to ensure that not only are team roster changes updated, 
-                    but we also have to make sure that changes in playstyle are also clearly reflected in our visualization.                </p>
+                    but we also have to make sure that changes in playstyle are also clearly reflected in our visualization.                
+                </p>
             </div>
         </div>
     </section>
 
+    <!-- THESE SCRIPT TAGS WERE MISSING! -->
     <script src="visualization.js" type="module"></script>
     <script src="scrolly.js"></script>
 </body>
