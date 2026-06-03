@@ -623,7 +623,43 @@ function initEvolutionChart(fullData) {
                 update => update.call(update => update.transition(t)
                     .attr('d', d => d3.line().x(s => x(s.season)).y(s => y(s[d.key]))(seasonData)))
             );
-
+        series.forEach(s => {
+            
+    linesG.selectAll(`.dot-${s.key}`)
+        .data(seasonData, d => d.season)
+        .join(
+            enter => enter.append('circle')
+                .attr('class', `dot-${s.key}`)
+                .attr('cx', d => x(d.season))
+                .attr('cy', y(0))
+                .attr('r', 5)
+                .attr('fill', s.color)
+                .attr('stroke', '#1a1a2e')
+                .attr('stroke-width', 2)
+                .call(enter => enter.transition(t)
+                    .attr('cy', d => y(d[s.key]))),
+            update => update.call(update => update.transition(t)
+                .attr('cx', d => x(d.season))
+                .attr('cy', d => y(d[s.key])))
+        )
+        .on('mouseover', (event, d) => {
+            tooltip
+                .style('opacity', 1)
+                .html(`
+                    <strong>${s.label}</strong><br/>
+                    Season: ${d.season}<br/>
+                    Avg: ${d[s.key].toFixed(1)}
+                `);
+        })
+        .on('mousemove', (event) => {
+            tooltip
+                .style('left', (event.pageX + 12) + 'px')
+                .style('top', (event.pageY - 28) + 'px');
+        })
+        .on('mouseout', () => {
+            tooltip.style('opacity', 0);
+        });
+});
         // Draw Legend ONCE
         if (g.selectAll('.macro-legend').empty()) {
             const legend = g.append('g').attr('class', 'macro-legend').attr('transform', `translate(${innerWidth -160}, 20)`);

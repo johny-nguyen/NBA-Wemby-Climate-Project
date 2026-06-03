@@ -405,3 +405,8 @@ svg text { fill: var(--muted) !important; }
 }
 
 
+#evolution-controls .glass-button {
+  position: static;
+  bottom: unset;
+  left: unset;
+}
