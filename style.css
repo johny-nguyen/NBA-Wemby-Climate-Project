@@ -64,7 +64,8 @@ body {
   height: 56.25vw !important;
   min-width: 177.78vh !important;
   min-height: 100vh !important;
-  transform: translate(-50%, -50%) !important;
+  /* THE FIX: Added scale(1.2) to push the title off the top of the screen! */
+  transform: translate(-50%, -50%) scale(1.2) !important;
   pointer-events: none;
 }
 

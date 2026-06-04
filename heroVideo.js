@@ -1,4 +1,4 @@
-const HERO_VIDEO_ID = 'hUOfC2ilXak';
+const HERO_VIDEO_ID = 'g72HIlL_k1c';
 
 let heroPlayer;
 let loopWatcher;
@@ -30,7 +30,8 @@ function createHeroPlayer() {
       mute: 1,
       playlist: HERO_VIDEO_ID,
       playsinline: 1,
-      rel: 0
+      rel: 0,
+      start: 10
     },
     events: {
       onReady: event => {
@@ -48,7 +49,7 @@ function createHeroPlayer() {
 }
 
 function restartHeroVideo(player) {
-  player.seekTo(0, true);
+  player.seekTo(10, true);
   player.playVideo();
 }
 

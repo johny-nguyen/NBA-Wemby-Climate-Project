@@ -50,9 +50,20 @@
         </div>
     </section>
 
+    <!-- NEW: BOTTOM LINE UP FRONT (TAKEAWAY) -->
+    <section id="takeaway-section" style="max-width: 1400px; margin: -2vh auto 10vh auto; padding: 0 40px; position: relative; z-index: 10;">
+        <div class="glass-card" style="border-left: 4px solid var(--accent); background: linear-gradient(90deg, rgba(255,69,0,0.08) 0%, rgba(255,255,255,0.02) 100%);">
+            <div class="badge">04 // THE TAKEAWAY</div>
+            <h2 style="color: var(--accent); margin-bottom: 12px;">A Faster, More Skilled League</h2>
+            <p style="font-size: 1.25rem; color: #fff; margin: 0; line-height: 1.7;">
+                The traditional, physical, paint-oriented era of basketball is officially dead. The analytics revolution proved the supreme efficiency of the three-point shot, forcing every team in the league to play significantly faster, shoot from further away, and prioritize high-volume transition offense just to survive.
+            </p>
+        </div>
+    </section>
+
     <section id="evolution-section" style="max-width: 1400px; margin: 5vh auto 10vh auto; padding: 0 40px; position: relative; z-index: 10;">
         <div class="glass-card">
-            <div class="badge">03.5 // MACRO TRENDS</div>
+            <div class="badge">05 // MACRO TRENDS</div>
             <h2>The Evolution of the League</h2>
             <p style="margin-bottom: 24px;">Before we look at individual teams, let's observe how the entire NBA's shot profile has changed. Notice the dramatic convergence of 2-point and 3-point attempts, and how consistent free throws (fouls) are over time.</p>
 
@@ -69,7 +80,7 @@
 
      <section id="context-section">
         <div class="glass-card">
-            <div class="badge">04 // Three Point Revolution</div>
+            <div class="badge">06 // THE CATALYST</div>
             <h2>What Marked the Beginning of the Three-Point Era?</h2>
             <p>
                 With the rise of analytics in the mid-2010s, teams began to realize the advantage of shooting from the perimeter. 
@@ -82,23 +93,18 @@
             <img src="steph.gif" alt="Three point shot" class="side-gif" />
             <img src="draymond.gif" alt="Three point shot" class="side-gif" />
         </div>
-        
-
-
     </section>
     
-    
-
-    <!-- NEW SEPARATE MAP SECTION -->
-    <section id="map-section">
+    <!-- MAP SECTION -->
+    <section id="map-section" style="max-width: 1400px; margin: 5vh auto 10vh auto; padding: 0 40px; position: relative; z-index: 10;">
         <div class="glass-card" style="position: relative; height: 80vh; display: flex; flex-direction: column;">
-            <div class="badge">04.5 // GEOGRAPHY</div>
+            <div class="badge">07 // GEOGRAPHY</div>
             <h2 style="margin-bottom: 8px;">Select Your Teams</h2>
             <p style="margin-bottom: 24px; font-size: 1rem;">Click on the map to select teams. Scroll down to see their historical trends.</p>
             
             <div id="map" style="flex-grow: 1; min-height: 0; border-radius: 16px; overflow: hidden; background: rgba(0,0,0,0.2); border: 1px solid var(--border);"></div>
             
-            <button id="reset-map-btn" class="glass-button">
+            <button id="reset-map-btn" class="glass-button" style="position: absolute; bottom: 100px; left: 40px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                     <path d="M3 3v5h5"></path>
@@ -113,25 +119,13 @@
         </div>
     </section>
 
-    <!-- SCROLLYTELLING SECTION (Now strictly for the Chart) -->
+    <!-- SCROLLYTELLING SECTION -->
     <main id="scrolly">
         <article class="scroll-text">
             
             <div class="step" data-step="1">
                 <div class="glass-card">
-                    <div class="badge">05 // STRATEGY</div>
-                    <h2>The 3-Point Surge (3PA)</h2>
-                    <p>For decades, the 3-pointer was treated as a desperation shot. Then, the analytics revolution revealed asimple mathematical reality: shooting 33% from the three-point range is equivalent to shooting 50% on mid-range jumpers.</p>
-                    <p>Watch the line chart morph. Compared to Pace and FGA, the upward trajectory of Three-Point Attempts is staggering. The baseline for what is considered "normal" has effectively doubled in a decade.</p>
-
-                    <h4 class="sub-heading">The Strategic Shift</h4>
-                    <p>The traditional "paint-oriented" big man has been phased out. Now, every player on the court is expected to shoot from the perimeter, stretching the defense to its breaking point.</p>
-                </div>
-            </div>
-
-            <div class="step" data-step="2">
-                <div class="glass-card">
-                    <div class="badge">06 // SPEED</div>
+                    <div class="badge">08 // SPEED</div>
                     <h2>The Pace of the Game</h2>
                     <p>Pace measures the number of possessions a team has per 48 minutes. In traditional basketball, teams would methodically walk the ball up the court to set up a half-court play. Today, the NBA has evolved into a track meet.</p>
                     
@@ -140,9 +134,9 @@
                 </div>
             </div>
 
-            <div class="step" data-step="3">
+            <div class="step" data-step="2">
                 <div class="glass-card">
-                    <div class="badge">07 // OFFENSE</div>
+                    <div class="badge">09 // OFFENSE</div>
                     <h2>Field Goal Attempts (FGA)</h2>
                     <p>With a faster pace comes more opportunities to score. Field Goal Attempts per game (FGA/G) measures sheer offensive volume—how many shots a team manages to put up before the buzzer sounds.</p>
                     
@@ -153,9 +147,21 @@
                 </div>
             </div>
 
+            <div class="step" data-step="3">
+                <div class="glass-card">
+                    <div class="badge">10 // STRATEGY</div>
+                    <h2>The 3-Point Surge (3PA)</h2>
+                    <p>For decades, the 3-pointer was treated as a desperation shot. Then, the analytics revolution revealed a simple mathematical reality: shooting 33% from the three-point range is equivalent to shooting 50% on mid-range jumpers.</p>
+                    <p>Watch the line chart morph. Compared to Pace and FGA, the upward trajectory of Three-Point Attempts is staggering. The baseline for what is considered "normal" has effectively doubled in a decade.</p>
+
+                    <h4 class="sub-heading">The Strategic Shift</h4>
+                    <p>The traditional "paint-oriented" big man has been phased out. Now, every player on the court is expected to shoot from the perimeter, stretching the defense to its breaking point.</p>
+                </div>
+            </div>
+
             <div class="step" data-step="4">
                 <div class="glass-card">
-                    <div class="badge">08 // SUCCESS</div>
+                    <div class="badge">11 // SUCCESS</div>
                     <h2>Translating to Wins</h2>
                     <p>Metrics like Pace and 3PA define <em>how</em> the game is played, but Wins define <em>why</em> it is played. Look at your selected teams to see their specific peaks and valleys across seasons.</p>
                     
@@ -171,24 +177,22 @@
         <figure class="sticky-dashboard">
             <div class="dashboard-wrapper glass-card">
                 
-                <!-- NEW FORMATTED TITLE BAR -->
                 <div id="controls" class="glass-controls" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;">
-                    <h3 id="chart-title" style="margin: 0; font-size: 1.5rem; color: var(--accent); font-weight: 600;">The 3-Point Surge (3PA/G)</h3>
+                    <h3 id="chart-title" style="margin: 0; font-size: 1.5rem; color: var(--accent); font-weight: 600;">The Pace of the Game</h3>
                     
-                    <!-- Team logos moved here to sit across from the title -->
                     <div id="team-logos" aria-label="Selected team logos"></div>
 
-                    <!-- Hidden toggles so scrolly.js still works perfectly! -->
+                    <!-- Hidden toggles synced with JS -->
                     <div id="metric-toggle" style="display: none;">
-                        <label><input type="radio" name="metric" value="pace"> Pace</label>
+                        <label><input type="radio" name="metric" value="pace" checked> Pace</label>
                         <label><input type="radio" name="metric" value="fga_per_game"> FGA/G</label>
-                        <label><input type="radio" name="metric" value="x3pa_per_game" checked> 3PA/G</label>
+                        <label><input type="radio" name="metric" value="x3pa_per_game"> 3PA/G</label>
                         <label><input type="radio" name="metric" value="wins"> Wins</label>
                     </div>
                 </div>
 
-                <section id="dashboard-wrap" style="display: flex; flex-direction: column;">
-                    <div id="dashboard">
+                <section id="dashboard-wrap" style="display: flex; flex-direction: column; flex-grow: 1;">
+                    <div id="dashboard" style="flex-grow: 1;">
                         <div id="chart" style="flex: 1; height: 100%;"></div>
                     </div>
                 </section>
@@ -198,7 +202,7 @@
 
     <section id="writeup-section">
         <div class="glass-card">
-            <div class="badge">09 // WRITEUP</div>
+            <div class="badge">12 // WRITEUP</div>
             <h2>Overview</h2>
             <p>
                 Our team’s final project aims to create an interactive data visualization experience 
@@ -232,7 +236,6 @@
         </div>
     </section>
 
-    <!-- THESE SCRIPT TAGS WERE MISSING! -->
     <script src="heroVideo.js"></script>
     <script src="visualization.js" type="module"></script>
     <script src="scrolly.js"></script>
