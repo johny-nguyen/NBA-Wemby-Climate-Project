@@ -389,9 +389,10 @@ function renderMap(mapData){
     .scale(1200)
     .translate([width / 2, height / 2]);
 
+    // THEME UPDATE: Sleek Cyber-Blue for East, Neon Orange Accent for West
     const color = d3.scaleOrdinal()
     .domain(['East', 'West'])
-    .range(['#3266ad', '#c0392b']);
+    .range(['#3b82f6', '#FF4500']);
 
     const nbaTeams = [
         { id:'Boston Celtics',          name:'Boston Celtics',          city:'Boston',        coords:[-71.062,42.356],  conf:'East', div:'Atlantic',  validFrom:2000 },
@@ -436,21 +437,16 @@ function renderMap(mapData){
 
     d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(us => {
         const states = topojson.feature(us, us.objects.states).features;
-        const stateColor = d3.scaleSequential()
-            .domain([-125, -66])
-            .interpolator(d3.interpolateRgbBasis(['#2f5d8a', '#4f9cb8', '#7ecf9a', '#f4c061', '#d9784d']));
 
         mapGroup.append('g')
             .selectAll('path')
             .data(states)
             .join('path')
             .attr('d', path)
-            .attr('fill', d => {
-                const c = d3.geoCentroid(d);
-                return stateColor(c[0]);
-            })
-            .attr('stroke', '#eef4fa')
-            .attr('stroke-width', 0.9);
+            // THEME UPDATE: Dark, translucent states with crisp glass borders
+            .attr('fill', 'rgba(255, 255, 255, 0.04)') 
+            .attr('stroke', 'rgba(255, 255, 255, 0.15)')
+            .attr('stroke-width', 1);
 
         const tooltip = d3.select('body')
             .selectAll('.map-tooltip')
@@ -473,11 +469,10 @@ function renderMap(mapData){
             .join('circle')
             .attr('cx', d => projection(d.coords)[0])
             .attr('cy', d => projection(d.coords)[1])
-            .attr('r', 20)
             .attr('fill', d => color(d.conf))
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 1.5)
-            .attr('opacity', 0.85)
+            // THEME UPDATE: Pure dark stroke so they "punch out" of the states cleanly
+            .attr('stroke', '#050507') 
+            .attr('stroke-width', 2)
             .on('mouseover', (event, d) => {
                 const logo = teamLogos[d.id];
                 tooltip
@@ -507,17 +502,17 @@ function renderMap(mapData){
                 updateTeamLogos();
 
                 circles.attr('opacity', t =>
-                    selectedTeams.includes(t.id) ? 1 : 0.3
+                    selectedTeams.includes(t.id) ? 1 : 0.25
                 ).attr('r', t =>
-                    selectedTeams.includes(t.id) ? 11 : 8
+                    selectedTeams.includes(t.id) ? 12 : 7
                 );
 
-                // Smoothly update when teams are selected
                 updateChart(mapData);
             });
 
-        circles.attr('opacity', d => selectedTeams.includes(d.id) ? 1 : 0.5)
-                .attr('r', d => selectedTeams.includes(d.id) ? 11 : 8);
+        // Initial styling for dots
+        circles.attr('opacity', d => selectedTeams.includes(d.id) ? 1 : 0.25)
+               .attr('r', d => selectedTeams.includes(d.id) ? 12 : 7);
 
         d3.select('#reset-map-btn').on('click', () => {
             selectedTeams = []; 
@@ -525,12 +520,10 @@ function renderMap(mapData){
             select.selectAll('option').property('selected', false);
 
             circles.transition().duration(300)
-                .attr('opacity', 0.3)
-                .attr('r', 8);
+                .attr('opacity', 0.25)
+                .attr('r', 7);
 
-            // Smoothly update when reset
             updateChart(mapData); 
-
             svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
         });
     });
