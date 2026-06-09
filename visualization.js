@@ -337,8 +337,8 @@ const metricTitles = {
     'pace': 'The Pace of the Game',
     'fga_per_game': 'Field Goal Attempts (FGA/G)',
     'x3pa_per_game': 'The 3-Point Surge (3PA/G)',
+    'efg_pct': 'Effective Field Goal Percentage',
     'wins': 'Translating to Wins',
-    'efg_pct': 'Effective Field Goal Percentage'
 };
 
 d3.selectAll('input[name="metric"]').on('change', function() {
