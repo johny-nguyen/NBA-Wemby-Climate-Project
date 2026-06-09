@@ -184,7 +184,9 @@ function updateChart(chartData) {
         d3.axisBottom(x).tickFormat(d3.format('d')).ticks(8)
     );
     chartG.select('.y-axis-group').transition(t).call(
-        d3.axisLeft(y)
+        d3.axisLeft(y).tickFormat(d =>
+        selectedMetric === 'efg_pct' ? d3.format('.0%')(d) : d
+    )
     );
 
     chartG.select('.lines-group').selectAll('.team-line')
@@ -235,7 +237,7 @@ function updateChart(chartData) {
         .html(`
         <strong>${d.team || 'League Avg'}</strong><br/>
         Season: ${d.season}<br/>
-        ${selectedMetric}: ${d[selectedMetric]?.toFixed(1)}<br/>
+        ${selectedMetric}: ${selectedMetric === 'efg_pct' ? (d[selectedMetric] * 100).toFixed(1) + '%': d[selectedMetric]?.toFixed(1)}<br/>
         ${selectedMetric === 'wins' && d.age != null ? `Avg Age: ${d.age.toFixed(1)}` : ''}
         ${d.playoffs !== undefined ? (d.playoffs ? '🏆 Playoff team' : '❌ Missed playoffs') : ''}
         `);
@@ -335,7 +337,8 @@ const metricTitles = {
     'pace': 'The Pace of the Game',
     'fga_per_game': 'Field Goal Attempts (FGA/G)',
     'x3pa_per_game': 'The 3-Point Surge (3PA/G)',
-    'wins': 'Translating to Wins'
+    'wins': 'Translating to Wins',
+    'efg_pct': 'Effective Field Goal Percentage'
 };
 
 d3.selectAll('input[name="metric"]').on('change', function() {

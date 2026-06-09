@@ -30,6 +30,8 @@ const observer = new IntersectionObserver((entries) => {
                 document.querySelector('input[value="x3pa_per_game"]').click();
             } else if (currentStepId === "4") {
                 document.querySelector('input[value="wins"]').click();
+            } else if (currentStepId === "5") {
+                document.querySelector('input[value="efg_pct"]').click();
             }
         }
     });
