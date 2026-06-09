@@ -29,9 +29,9 @@ const observer = new IntersectionObserver((entries) => {
             } else if (currentStepId === "3") {
                 document.querySelector('input[value="x3pa_per_game"]').click();
             } else if (currentStepId === "4") {
-                document.querySelector('input[value="wins"]').click();
-            } else if (currentStepId === "5") {
                 document.querySelector('input[value="efg_pct"]').click();
+            } else if (currentStepId === "5") {
+                document.querySelector('input[value="wins"]').click();
             }
         }
     });
