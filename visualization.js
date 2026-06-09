@@ -8,7 +8,8 @@ async function loadData(){
         season: Number(row.season),
         pace: Number(row.pace),
         playoffs: row.playoffs === 'True',
-        age: Number(row.age)
+        age: Number(row.age),
+        efg_pct: Number(row.e_fg_percent)
     })),
     d3.csv('team_stats_per_game.csv', row => ({
         team: row.team,
