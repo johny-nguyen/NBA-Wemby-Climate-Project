@@ -1,3 +1,9 @@
+// Force the browser to start at the top of the page on every reload
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
+
 // Set up an Intersection Observer to watch the text steps
 const steps = document.querySelectorAll('.step');
 
