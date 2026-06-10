@@ -130,6 +130,18 @@ function initChart() {
         .attr('height', '100%')
         .style('overflow', 'visible');
 
+    chartSvg.append('defs').append('marker')
+        .attr('id', 'scrolly-arrow')
+        .attr('viewBox', '0 -5 10 10')
+        .attr('refX', 8)
+        .attr('refY', 0)
+        .attr('markerWidth', 6)
+        .attr('markerHeight', 6)
+        .attr('orient', 'auto')
+        .append('path')
+        .attr('d', 'M0,-5L10,0L0,5')
+        .attr('fill', '#FF4500'); // Matches the 3PA orange color
+
     chartG = chartSvg.append('g')
         .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
@@ -331,13 +343,77 @@ function updateChart(chartData) {
             ),
             exit => exit.call(exit => exit.transition(t).attr('opacity', 0).remove())
         );
+        
+    // "PEAK MOREYBALL" ANNOTATION
+    // 1. Ensure the annotation group exists
+    let scrollyAnnoG = chartG.select('.scrolly-annotation');
+    if (scrollyAnnoG.empty()) {
+        scrollyAnnoG = chartG.append('g').attr('class', 'scrolly-annotation');
+    }
+
+    // 2. Check our conditions: Metric must be 3PA and Rockets must be on the chart
+    const is3PAMetric = selectedMetric === 'x3pa_per_game';
+    const hasRockets = selectedTeams.includes('Houston Rockets');
+
+    if (is3PAMetric && hasRockets) {
+        // Find the specific data point for the Rockets in the 2018-2019 season (using 2019)
+        const rocketsPeak = chartData.find(d => d.team === 'Houston Rockets' && d.season === 2019);
+
+        if (rocketsPeak) {
+            const targetX = x(rocketsPeak.season);
+            const targetY = y(rocketsPeak.x3pa_per_game);
+
+            scrollyAnnoG.selectAll('*').remove(); // Clear previous rendering
+
+            // Draw the connecting line/arrow
+            scrollyAnnoG.append('line')
+                .attr('x1', targetX - 80) // Start to the left
+                .attr('y1', targetY - 40) // Start slightly above
+                .attr('x2', targetX - 10) // Point to the node
+                .attr('y2', targetY - 10)
+                .attr('stroke', '#FF4500')
+                .attr('stroke-width', 2)
+                .attr('marker-end', 'url(#scrolly-arrow)')
+                .attr('opacity', 0)
+                .transition(t).attr('opacity', 1);
+
+            // Add the main title text
+            scrollyAnnoG.append('text')
+                .attr('x', targetX - 85)
+                .attr('y', targetY - 45)
+                .attr('fill', '#fff')
+                .attr('text-anchor', 'end')
+                .style('font-size', '14px')
+                .style('font-weight', 'bold')
+                .text('2018-19: Peak Moreyball')
+                .attr('opacity', 0)
+                .transition(t).attr('opacity', 1);
+
+            // Add the explanatory subtext
+            scrollyAnnoG.append('text')
+                .attr('x', targetX - 85)
+                .attr('y', targetY - 28)
+                .attr('fill', '#9ca3af')
+                .attr('text-anchor', 'end')
+                .style('font-size', '12px')
+                .text('Rockets shoot a historic 45.4 threes/game')
+                .attr('opacity', 0)
+                .transition(t).attr('opacity', 1);
+        }
+    } else {
+        // If the conditions aren't met (e.g., user clicked Pace or removed Rockets), fade it out
+        scrollyAnnoG.selectAll('*')
+            .transition(t)
+            .attr('opacity', 0)
+            .remove();
+    }
 }
 
 const metricTitles = {
     'pace': 'The Pace of the Game',
     'fga_per_game': 'Field Goal Attempts (FGA/G)',
     'x3pa_per_game': 'The 3-Point Surge (3PA/G)',
-    'efg_pct': 'Effective Field Goal Percentage',
+    'efg_pct': 'Effective Field Goal Percentage (EFG%)',
     'wins': 'Translating to Wins',
 };
 
